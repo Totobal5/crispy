@@ -61,6 +61,44 @@ function test_crispy_case_assert_equal_fails_with_different_values() {
 	AssertFalse(_case.__logs[0].__pass, "Assertion should fail");
 }
 
+function test_crispy_case_assert_deep_equal_passes_with_structs_and_arrays() {
+	var _case = new CrispyCase("test", function() {});
+
+	var _expected = {
+		stats: { hp: 10, mp: 5 },
+		items: [ "sword", "shield" ],
+		flags: [ true, false, true ],
+	};
+
+	var _actual = {
+		stats: { hp: 10, mp: 5 },
+		items: [ "sword", "shield" ],
+		flags: [ true, false, true ],
+	};
+
+	_case.AssertDeepEqual(_actual, _expected, "Structs and arrays should match");
+
+	AssertTrue(_case.__logs[0].__pass, "AssertDeepEqual should pass for matching nested data");
+}
+
+function test_crispy_case_assert_deep_equal_fails_on_difference() {
+	var _case = new CrispyCase("test", function() {});
+
+	var _expected = {
+		stats: { hp: 10, mp: 5 },
+		items: [ "sword", "shield" ],
+	};
+
+	var _actual = {
+		stats: { hp: 8, mp: 5 },
+		items: [ "sword", "shield" ],
+	};
+
+	_case.AssertDeepEqual(_actual, _expected, "Stats should match");
+
+	AssertFalse(_case.__logs[0].__pass, "AssertDeepEqual should fail when nested values differ");
+}
+
 function test_crispy_case_assert_true_passes() {
 	var _case = new CrispyCase("test", function() {});
 	_case.AssertTrue(true, "Should be true");

@@ -107,6 +107,39 @@ function CrispyCase(_name, _func, _unpack = undefined) : CrispyTest(_name) const
 		return self;
 	}
 
+	/// @description Test deep equality between two values (arrays/structs recurse)
+	/// @param {Any} first - First value
+	/// @param {Any} second - Second value to check against first
+	/// @param {String} [message] - Custom message to output on failure
+	/// @returns {Struct.CrispyCase} Self for chaining
+	static AssertDeepEqual = function(_first, _second, _message)
+	{
+		// Check supplied arguments
+		if (argument_count < 2)
+		{
+			show_error($"{instanceof(self)}.AssertDeepEqual() expected 2 arguments, received {argument_count}.", true);
+		}
+        
+		if (!__crispy_validate_message_param(instanceof(self), "AssertDeepEqual", _message)) return self;
+        
+		if (__DeepEqual(_first, _second))
+		{
+			AddLog(new CrispyLog(self, {
+				__pass: true,
+			}));
+		}
+		else
+		{
+			AddLog(new CrispyLog(self, {
+				__pass: false,
+				__msg: _message,
+				__helper_text: "first and second are not deeply equal.",
+			}));
+		}
+
+		return self;
+	}
+
 	/// @description Test that first and second are not equal
 	/// @param {Any} first - First type to check
 	/// @param {Any} second - Second type to check against
@@ -581,4 +614,45 @@ function CrispyCase(_name, _func, _unpack = undefined) : CrispyTest(_name) const
 	{
 		return $"<Crispy Case(\"{__name}\")>";
 	}
+    
+    /// @ignore
+    static __DeepEqual = function(_a, _b)
+		{
+			if (typeof(_a) != typeof(_b)) return false;
+
+			if (is_array(_a))
+			{
+				if (array_length(_a) != array_length(_b)) return false;
+
+				var _i = 0; repeat (array_length(_a))
+				{
+					if (!__DeepEqual(_a[_i], _b[_i])) return false;
+					++_i;
+				}
+
+				return true;
+			}
+
+			if (is_struct(_a))
+			{
+				var _a_keys = struct_get_names(_a);
+				var _b_keys = struct_get_names(_b);
+				if (array_length(_a_keys) != array_length(_b_keys)) return false;
+
+				array_sort(_a_keys, true);
+				array_sort(_b_keys, true);
+
+				var _k = 0; repeat (array_length(_a_keys))
+				{
+					var _name = _a_keys[_k];
+					if (_name != _b_keys[_k]) return false;
+					if (!__DeepEqual(struct_get(_a, _name), struct_get(_b, _name))) return false;
+					++_k;
+				}
+
+				return true;
+			}
+
+			return (_a == _b);
+		}
 }

@@ -25,6 +25,7 @@ function CrispySuite(_name, _unpack = undefined) : CrispyTest(_name) constructor
 			var _type = !is_undefined(instanceof(_test_case)) ? instanceof(_test_case) : typeof(_test_case);
 			__crispy_error($"{instanceof(self)}.AddCase() \"_test_case\" expected an instance of CrispyCase, received {_type}.");
 		}
+		
 		_test_case.__parent = self;
 		array_push(__tests, _test_case);
 
