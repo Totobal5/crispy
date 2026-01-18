@@ -2,13 +2,12 @@
 
 /**
  * Creates a Test case object to run assertions
- * @constructor TestCase
  * @param {String} _name - Name of case
  * @param {Function} _func - Function for test assertion
  * @param {Struct} [_unpack=undefined] - Struct for crispyStructUnpack
  */
-function TestCase(_name, _func, _unpack=undefined) : BaseTestClass(_name) constructor {
-
+function CrispyCase(_name, _func, _unpack=undefined) : CrispyTest(_name) constructor
+{
 	if !is_method(_func) {
 		throw(instanceof(self) + " \"func\" expected a function, received " + typeof(_func) + ".");
 	}

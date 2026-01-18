@@ -1,9 +1,9 @@
 {
   "$GMScript":"v1",
-  "%Name":"BaseTestClass",
+  "%Name":"crispy_Test",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"BaseTestClass",
+  "name":"crispy_Test",
   "parent":{
     "name":"Crispy",
     "path":"folders/Crispy.yy",

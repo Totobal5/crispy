@@ -1,9 +1,9 @@
 {
   "$GMScript":"v1",
-  "%Name":"CrispyLog",
+  "%Name":"crispy_Functions",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"CrispyLog",
+  "name":"crispy_Functions",
   "parent":{
     "name":"Crispy",
     "path":"folders/Crispy.yy",

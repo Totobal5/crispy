@@ -2,12 +2,11 @@
 
 /**
  * Testing suite that holds tests
- * @constructor TestSuite
  * @param {String} _name - Name of suite
  * @param {Struct} [_unpack=undefined] - Struct for crispyStructUnpack
  */
-function TestSuite(_name, _unpack=undefined) : BaseTestClass(_name) constructor {
-
+function CrispySuite(_name, _unpack=undefined) : CrispyTest(_name) constructor 
+{
 	parent = undefined;
 	tests = [];
 

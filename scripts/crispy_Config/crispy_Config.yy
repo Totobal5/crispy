@@ -1,9 +1,9 @@
 {
   "$GMScript":"v1",
-  "%Name":"crispyGetTimeDiff",
+  "%Name":"crispy_Config",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"crispyGetTimeDiff",
+  "name":"crispy_Config",
   "parent":{
     "name":"Crispy",
     "path":"folders/Crispy.yy",

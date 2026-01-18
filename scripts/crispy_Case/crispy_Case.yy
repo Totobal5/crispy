@@ -1,9 +1,9 @@
 {
   "$GMScript":"v1",
-  "%Name":"__crispyStructUnpack",
+  "%Name":"crispy_Case",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"__crispyStructUnpack",
+  "name":"crispy_Case",
   "parent":{
     "name":"Crispy",
     "path":"folders/Crispy.yy",

@@ -1,13 +1,10 @@
-// Feather disable all
-
 /**
  * Saves the result and output of assertion
- * @constructor CrispyLog
  * @param {Struct} _test_case - Struct that holds the test case
  * @param {Struct} [_unpack=undefined] - Struct to use with crispyStructUnpack
  */
-function CrispyLog(_test_case, _unpack=undefined) constructor {
-
+function CrispyLog(_test_case, _unpack=undefined) constructor
+{
 	if !is_struct(_test_case) {
 		throw(instanceof(self) + " \"_test_case\" expected a struct, received " + typeof(_test_case) + ".");
 	}

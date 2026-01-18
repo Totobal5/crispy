@@ -1,9 +1,9 @@
 {
   "$GMScript":"v1",
-  "%Name":"TestRunner",
+  "%Name":"crispy_Runner",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"TestRunner",
+  "name":"crispy_Runner",
   "parent":{
     "name":"Crispy",
     "path":"folders/Crispy.yy",

@@ -1,9 +1,9 @@
 {
   "$GMScript":"v1",
-  "%Name":"crispyTimeConvert",
+  "%Name":"crispy_Suite",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"crispyTimeConvert",
+  "name":"crispy_Suite",
   "parent":{
     "name":"Crispy",
     "path":"folders/Crispy.yy",

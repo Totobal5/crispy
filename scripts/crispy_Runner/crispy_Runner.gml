@@ -1,13 +1,12 @@
 // Feather disable all
 
 /**
- * Runner to hold test suites and iterates through each TestSuite, running its tests
- * @constructor TestRunner
+ * Runner to hold test suites and iterates through each CrispySuite, running its tests
  * @param {String} _name - Name of runner
  * @param {Struct} [_unpack=undefined] - Struct for crispyStructUnpack
  */
-function TestRunner(_name, _unpack=undefined) : BaseTestClass(_name) constructor {
-
+function CrispyRunner(_name, _unpack=undefined) : CrispyTest(_name) constructor
+{
 	start_time = 0;
 	stop_time = 0;
 	total_time = 0;

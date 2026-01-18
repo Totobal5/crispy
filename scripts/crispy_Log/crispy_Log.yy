@@ -1,9 +1,9 @@
 {
   "$GMScript":"v1",
-  "%Name":"crispyIsInternalVariable",
+  "%Name":"crispy_Log",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"crispyIsInternalVariable",
+  "name":"crispy_Log",
   "parent":{
     "name":"Crispy",
     "path":"folders/Crispy.yy",

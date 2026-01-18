@@ -1,12 +1,11 @@
-// Feather disable all
-
 /**
- * Base "class" that test constructors will inherit from
- * @constructor BaseTestClass
+ * Base constructor that test constructors will inherit from
  * @param {String} _name - Name of class
- */
-function BaseTestClass(_name) constructor {
-
+ **/
+function CrispyTest(_name) constructor
+{
+    static vars = {};
+    
 	name = undefined;
 	static setUp = undefined;
 	static __setUp__ = undefined;
