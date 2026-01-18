@@ -122,11 +122,10 @@ function CrispyRunner(_name, _unpack = undefined) : CrispyTest(_name) constructo
 	/// @description Clears logs, starts timer, and runs __SetUp
 	/// @param {Function} [func] - Method to override __SetUp with
 	/// @returns {Struct.CrispyRunner} Self for chaining
-	static SetUp = function()
+	static SetUp = function(_func)
 	{
-		if (argument_count > 0)
+		if (!is_undefined(_func))
 		{
-			var _func = argument[0];
 			if (is_method(_func))
 			{
 				__SetUp = method(self, _func);
@@ -140,7 +139,7 @@ function CrispyRunner(_name, _unpack = undefined) : CrispyTest(_name) constructo
 		{
 			__logs = [];
 			__start_time = get_timer();
-			if (is_method(__SetUp) ) { __SetUp(); }
+			if (is_method(__SetUp)) { __SetUp(); }
 		}
 
 		return self;
@@ -149,11 +148,10 @@ function CrispyRunner(_name, _unpack = undefined) : CrispyTest(_name) constructo
 	/// @description Function ran after test, used to clean up test
 	/// @param {Function} [func] - Method to override __TearDown with
 	/// @returns {Struct.CrispyRunner} Self for chaining
-	static TearDown = function()
+	static TearDown = function(_func)
 	{
-		if (argument_count > 0)
+		if (!is_undefined(_func))
 		{
-			var _func = argument[0];
 			if (is_method(_func))
 			{
 				__TearDown = method(self, _func);

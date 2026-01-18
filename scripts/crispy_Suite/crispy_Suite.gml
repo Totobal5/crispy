@@ -32,13 +32,12 @@ function CrispySuite(_name, _unpack = undefined) : CrispyTest(_name) constructor
 	}
 
 	/// @description Event that runs before all tests to set up variables. Can also overwrite __SetUp
-	/// @param {Function} [_func] - Function to overwrite __SetUp
+	/// @param {Function} [func] - Function to overwrite __SetUp
 	/// @return {Struct.CrispySuite} Self for chaining
-	static SetUp = function()
+	static SetUp = function(_func)
 	{
-		if (argument_count > 0)
+		if (!is_undefined(_func))
 		{
-			var _func = argument[0];
 			var _bound = __crispy_validate_and_bind_method(instanceof(self), "SetUp", _func);
 			if (!is_undefined(_bound))
 			{
@@ -57,13 +56,12 @@ function CrispySuite(_name, _unpack = undefined) : CrispyTest(_name) constructor
 	}
 
 	/// @description Event that runs after all tests to clean up variables. Can also overwrite __TearDown
-	/// @param {Function} [_func] - Function to overwrite __TearDown
+	/// @param {Function} [func] - Function to overwrite __TearDown
 	/// @return {Struct.CrispySuite} Self for chaining
-	static TearDown = function()
+	static TearDown = function(_func)
 	{
-		if (argument_count > 0)
+		if (!is_undefined(_func))
 		{
-			var _func = argument[0];
 			var _bound = __crispy_validate_and_bind_method(instanceof(self), "TearDown", _func);
 			if (!is_undefined(_bound))
 			{

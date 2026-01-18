@@ -23,12 +23,12 @@ function CrispyTest(_name) constructor
 	static __OnRunEnd = undefined;
 
 	__struct_unpack = method(self, __crispy_struct_unpack);
-	
+
 	__SetName(_name);
 
 	// Getters
 
-	/// Get the name of this test
+	/// @description Get the name of this test
 	/// @returns {String} Name of the test
 	static GetName = function()
 	{
@@ -38,7 +38,7 @@ function CrispyTest(_name) constructor
 	// Methods
 
 	/// @ignore
-	/// Set name of class object
+	/// @description Set name of class object
 	/// @param {String} name - Name of the object
 	static __SetName = function(_name)
 	{
@@ -49,13 +49,19 @@ function CrispyTest(_name) constructor
 		__name = _name;
 	}
 
-	/// Event to be called at the beginning of run
+	/// @description Event to be called at the beginning of run
 	/// @param {Function} [func] - Method to override __OnRunBegin with
-	static OnRunBegin = function()
+	static OnRunBegin = function(_func)
 	{
-		if (argument_count > 0)
+		if (is_undefined(_func))
 		{
-			var _func = argument[0];
+			if (is_method(__OnRunBegin))
+			{
+				__OnRunBegin();
+			}
+		}
+		else
+		{
 			if (is_method(_func))
 			{
 				__OnRunBegin = method(self, _func);
@@ -65,22 +71,21 @@ function CrispyTest(_name) constructor
 				__crispy_error($"{instanceof(self)}.OnRunBegin() \"func\" expected a function, received {typeof(_func)}.");
 			}
 		}
-		else
-		{
-			if (is_method(__OnRunBegin))
-			{
-				__OnRunBegin();
-			}
-		}
 	}
 
-	/// Event to be called at the end of run
+	/// @description Event to be called at the end of run
 	/// @param {Function} [func] - Method to override __OnRunEnd with
-	static OnRunEnd = function()
+	static OnRunEnd = function(_func)
 	{
-		if (argument_count > 0)
+		if (is_undefined(_func))
 		{
-			var _func = argument[0];
+			if (is_method(__OnRunEnd))
+			{
+				__OnRunEnd();
+			}
+		}
+		else
+		{
 			if (is_method(_func))
 			{
 				__OnRunEnd = method(self, _func);
@@ -88,13 +93,6 @@ function CrispyTest(_name) constructor
 			else
 			{
 				__crispy_error($"{instanceof(self)}.OnRunEnd() \"func\" expected a function, received {typeof(_func)}.");
-			}
-		}
-		else
-		{
-			if (is_method(__OnRunEnd))
-			{
-				__OnRunEnd();
 			}
 		}
 	}

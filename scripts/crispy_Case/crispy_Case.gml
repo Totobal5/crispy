@@ -498,11 +498,10 @@ function CrispyCase(_name, _func, _unpack = undefined) : CrispyTest(_name) const
 	/// @description Function ran before test, used to set up test
 	/// @param {Function} [func] - Method to override __SetUp with
 	/// @returns {Struct.CrispyCase} Self for chaining
-	static SetUp = function()
+	static SetUp = function(_func)
 	{
-		if (argument_count > 0)
+		if (!is_undefined(_func))
 		{
-			var _func = argument[0];
 			var _bound = __crispy_validate_and_bind_method(instanceof(self), "SetUp", _func);
 			if (!is_undefined(_bound))
 			{
@@ -524,11 +523,10 @@ function CrispyCase(_name, _func, _unpack = undefined) : CrispyTest(_name) const
 	/// @description Function ran after test, used to clean up test
 	/// @param {Function} [func] - Method to override __TearDown with
 	/// @returns {Struct.CrispyCase} Self for chaining
-	static TearDown = function()
+	static TearDown = function(_func)
 	{
-		if (argument_count > 0)
+		if (!is_undefined(_func))
 		{
-			var _func = argument[0];
 			var _bound = __crispy_validate_and_bind_method(instanceof(self), "TearDown", _func);
 			if (!is_undefined(_bound))
 			{
