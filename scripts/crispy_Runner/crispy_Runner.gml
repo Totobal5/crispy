@@ -21,7 +21,7 @@ function CrispyRunner(_name, _unpack=undefined) : CrispyTest(_name) constructor
 	 */
 	if !is_undefined(_unpack) {
 		if is_struct(_unpack) {
-			crispyStructUnpack(_unpack);
+			struct_unpack(_unpack);
 		} else {
 			throw(instanceof(self) + " \"_unpack\" expected a struct or undefined, recieved " + typeof(_unpack) + ".");
 		}
@@ -145,7 +145,7 @@ function CrispyRunner(_name, _unpack=undefined) : CrispyTest(_name) constructor
 			}
 		} else {
 			logs = [];
-			start_time = crispyGetTime();
+			start_time = get_timer();
 			if is_method(__setUp__) {
 				__setUp__();
 			}
@@ -171,9 +171,9 @@ function CrispyRunner(_name, _unpack=undefined) : CrispyTest(_name) constructor
 			}
 
 			// Get total run time
-			stop_time = crispyGetTime();
-			total_time = crispyGetTimeDiff(start_time, stop_time);
-			display_time = crispyTimeConvert(total_time);
+			stop_time = get_timer();
+			total_time = stop_time - start_time;
+			display_time = string_format(total_time / 1000000, 0, CRISPY_TIME_PRECISION);
 
 			// Display silent test results
 			var _passed_tests = 0;

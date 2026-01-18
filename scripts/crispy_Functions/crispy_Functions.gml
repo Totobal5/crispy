@@ -1,128 +1,50 @@
-/**
- * Helper function for Crispy to display its debug messages
- * @param {Any} [_message] - Text to be displayed in the Output Window
- */
-function __crispy_alert(_msg)
+/// Helper function for Crispy to display debug messages
+/// @param {Any} msg - Text to be displayed in the Output Window
+function __crispy_alert(msg)
 {
-	if (CRISPY_DEBUG) show_debug_message(CRISPY_NAME + $"ALERT: {_msg}");
+	if (CRISPY_DEBUG) show_debug_message(CRISPY_NAME + $"ALERT: {msg}");
 }
 
-/**
- * Helper function for Crispy to display its debug messages
- * @param {Any} [_message] - Text to be displayed in the Output Window
- */
-function __crispy_error(_msg)
+/// Helper function for Crispy to display error messages
+/// @param {Any} msg - Text to be displayed in the Output Window
+function __crispy_error(msg)
 {
-	if (CRISPY_DEBUG) show_debug_message(CRISPY_NAME + $"ERROR: {_msg}");
+	if (CRISPY_DEBUG) show_debug_message(CRISPY_NAME + $"ERROR: {msg}");
 }
 
-
-/**
- * Returns the current time in micro-seconds since the project started running
- * @returns {Real} Time that your game has been running in milliseconds
- */
-function crispyGetTime() 
+/// Mixin function that extends structs with the struct_unpack() method
+function __mixin_struct_unpack()
 {
-	return get_timer();
+	struct_unpack = method(self, __struct_unpack);
 }
 
-/**
- * Returns the difference between two times
- * @function crispyGetTimeDiff
- * @param {Real} _start_time - Starting time in milliseconds
- * @param {Real} _stop_time - Stopping time in milliseconds
- * @returns {Real} Difference between start_time and stop_time
- */
-function crispyGetTimeDiff(_start_time, _stop_time) 
+/// Helper function for structs that replaces variable values with given source struct values
+/// @param {Struct} unpack - Struct used to replace existing values with
+/// @param {Bool} [name_must_exist=true] - Boolean flag that prevents new variable names from being added to destination struct if variable name does not already exist
+/// @ignore
+function __struct_unpack(unpack, name_must_exist = true)
 {
-	if !is_real(_start_time) 
-    {
-		throw("crispyGetTimeDiff() \"_start_time\" expected a real number, received " + typeof(_start_time) + ".");
+	if !is_struct(unpack) {
+		throw("struct_unpack() \"unpack\" expected a struct, received " + typeof(unpack) + ".");
 	}
-    
-	if !is_real(_stop_time)
-    {
-		throw("crispyGetTimeDiff() \"_stop_time\" expected a real number, received " + typeof(_stop_time) + ".");
-	}
-    
-	return _stop_time - _start_time;
-}
-
-/**
- * Helper function for Crispy that returns whether or not a given variable name follows internal variable
- * 		naming convention
- * @param {String} _name - Name of variable to check
- * @returns {Bool} Whether the given string follows internal variable naming convention
- */
-function crispyIsInternalVariable(_name)
-{
-	if !is_string(_name) {
-		throw("crispyIsInternalVariable() \"_name\" expected a string, received " + typeof(_name) + ".");
-	}
-	
-	var _len = string_length(_name);
-	if _len > 4 && string_copy(_name, 1, 2) == "__" && string_copy(_name, _len - 1, _len) == "__" {
-		return true;
-	}
-    
-	return false;
-}
-
-/**
- * Mixin function that extends structs to have the crispyStructUnpack() function
- */
-function crispyMixinStructUnpack() {
-	crispyStructUnpack = method(self, __crispyStructUnpack);
-}
-
-/**
- * Converts the given time milliseconds to seconds as a string
- * @param {Real} _time - Time in milliseconds
- * @returns {String} time in seconds with CRISPY_TIME_PRECISION number
- * 		of decimal points as a string
- */
-function crispyTimeConvert(_time) 
-{
-	if !is_real(_time) 
-    {
-		throw("crispyTimeConvert() \"_time\" expected a real number, received " + typeof(_time) + ".");
-	}
-    
-	return string_format(_time / 1000000, 0, CRISPY_TIME_PRECISION);
-}
-
-/**
- * Helper function for structs that will replace a destination's
- * 		variable name values with the given source's variable name values
- * @param {Struct} _unpack - Struct used to replace existing values with
- * @param {Bool} [_name_must_exist=true] - Boolean flag that prevents
- * 		new variable names from being added to the destination struct if
- * 		the variable name does not already exist
- * @ignore
- */
-function __crispyStructUnpack(_unpack, _name_must_exist=true)
-{
-	if !is_struct(_unpack) {
-		throw("crispyStructUnpack() \"_unpack\" expected a struct, received " + typeof(_unpack) + ".");
-	}
-	if !is_bool(_name_must_exist) {
-		throw("crispyStructUnpack() \"_name_must_exist\" expected a boolean, received " + typeof(_name_must_exist) + ".");
+	if !is_bool(name_must_exist) {
+		throw("struct_unpack() \"name_must_exist\" expected a boolean, received " + typeof(name_must_exist) + ".");
 	}
 
-	var _names = variable_struct_get_names(_unpack);
+	var _names = variable_struct_get_names(unpack);
 	var _len = array_length(_names);
 	var i = 0;
 	repeat (_len) {
 		var _name = _names[i];
-		if !CRISPY_STRUCT_UNPACK_ALLOW_DUNDER && crispyIsInternalVariable(_name) {
+		if !CRISPY_STRUCT_UNPACK_ALLOW_DUNDER && __is_internal_variable(_name) {
 			if CRISPY_DEBUG {
 				crispyDebugMessage("Variable names beginning and ending in double underscores are reserved for the framework. Skip unpacking struct name: " + _name);
 			}
 			++i;
 			continue;
 		}
-		var _value = variable_struct_get(_unpack, _name);
-		if _name_must_exist {
+		var _value = variable_struct_get(unpack, _name);
+		if name_must_exist {
 			// Feather disable once GM1041
 			if !variable_struct_exists(self, _name) {
 				if CRISPY_DEBUG {
@@ -136,4 +58,21 @@ function __crispyStructUnpack(_unpack, _name_must_exist=true)
 		variable_struct_set(self, _name, _value);
 		++i;
 	}
+}
+
+/// Helper function that returns whether or not a given variable name follows internal variable naming convention
+/// @param {String} name - Name of variable to check
+/// @returns {Bool} Whether the given string follows internal variable naming convention
+function __is_internal_variable(name)
+{
+	if !is_string(name) {
+		throw("is_internal_variable() \"name\" expected a string, received " + typeof(name) + ".");
+	}
+	
+	var _len = string_length(name);
+	if _len > 4 && string_copy(name, 1, 2) == "__" && string_copy(name, _len - 1, _len) == "__" {
+		return true;
+	}
+    
+	return false;
 }
