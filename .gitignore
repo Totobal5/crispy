@@ -7,9 +7,10 @@ ___yyp_maker_trash/
 # Stitch files
 tmp/
 stitch.config.json
-<<<<<<< HEAD
 *.stitch
-=======
+
 sprites.import.json
 sprites.info.json
->>>>>>> master
+
+# Github
+.github/

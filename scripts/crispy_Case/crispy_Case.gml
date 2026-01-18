@@ -1,6 +1,4 @@
-// Feather disable all
-
-/// Creates a Test case object to run assertions
+/// @description Creates a Test case object to run assertions
 /// @param {String} name - Name of case
 /// @param {Function} func - Function for test assertion
 /// @param {Struct} [unpack=undefined] - Struct for struct_unpack
@@ -11,37 +9,33 @@ function CrispyCase(_name, _func, _unpack = undefined) : CrispyTest(_name) const
 		__crispy_error($"{instanceof(self)} \"func\" expected a function, received {typeof(_func)}.");
 	}
 
+	/// @ignore
 	__class = instanceof(self);
+	/// @ignore
 	__parent = undefined;
+	/// @ignore
 	__test = method(self, _func);
+	/// @ignore
 	__logs = [];
+	/// @ignore
 	__is_discovered = false;
+	/// @ignore
 	__discovered_script = undefined;
 
 	/// Run struct unpacker if unpack argument was provided
 	/// Stays after all variables are initialized so they may be overwritten
-	if (!is_undefined(_unpack))
-	{
-		if (is_struct(_unpack))
-		{
-			struct_unpack(_unpack);
-		}
-		else
-		{
-			__crispy_error($"{instanceof(self)} \"unpack\" expected a struct or undefined, recieved {typeof(_unpack)}.");
-		}
-	}
+	__crispy_validate_unpack_param(instanceof(self), "", _unpack);
 
 	// Getters
 
-	/// Get the class name of this test case
+	/// @description Get the class name of this test case
 	/// @returns {String} Class name of the test case
 	static GetClass = function()
 	{
 		return __class;
 	}
 
-	/// Get all logs of this test case
+	/// @description Get all logs of this test case
 	/// @returns {Array} Array of logs
 	static GetLogs = function()
 	{
@@ -50,68 +44,74 @@ function CrispyCase(_name, _func, _unpack = undefined) : CrispyTest(_name) const
 
 	// Methods
 
-	/// Adds a Log to the array of logs
+	/// @description Adds a Log to the array of logs
 	/// @param {Struct} log - Log struct
+	/// @returns {Struct.CrispyCase} Self for chaining
 	static AddLog = function(_log)
 	{
-		if (!is_struct(_log))
-		{
-			__crispy_error($"{instanceof(self)}.AddLog() \"log\" expected a struct, recieved {typeof(_log)}.");
-		}
+		if (!__crispy_validate_struct_param(instanceof(self), "AddLog", "log", _log)) return;
 		array_push(__logs, _log);
+
+		return self;
 	}
 
-	/// Clears array of Logs
+	/// @description Clears array of Logs
+	/// @returns {Struct.CrispyCase} Self for chaining
 	static ClearLogs = function()
 	{
 		__logs = [];
+		return self;
 	}
 
-	/// Test that first and second are equal
-	/// The first and second will be checked for the same type first, then check if they're equal
+	/// @description Test that first and second are equal. The first and second will be checked for the same type first, then check if they're equal
 	/// @param {Any} first - First value
 	/// @param {Any} second - Second value to check against first
 	/// @param {String} [message] - Custom message to output on failure
+	/// @returns {Struct.CrispyCase} Self for chaining
 	static AssertEqual = function(_first, _second, _message)
 	{
 		// Check supplied arguments
 		if (argument_count < 2)
 		{
-			show_error($"{instanceof(self)}.AssertEqual() expected 2 arguments, recieved {argument_count}.", true);
+			show_error($"{instanceof(self)}.AssertEqual() expected 2 arguments, received {argument_count}.", true);
 		}
-		if (!is_string(_message) && !is_undefined(_message))
-		{
-			__crispy_error($"{instanceof(self)}.AssertEqual() \"message\" expected either a string or undefined, received {typeof(_message)}.");
-		}
+
+		if (!__crispy_validate_message_param(instanceof(self), "AssertEqual", _message)) return;
+
 		// Check types of first and second
 		if (typeof(_first) != typeof(_second))
 		{
 			AddLog(new CrispyLog(self, {
-				pass: false,
-				msg: $"Supplied value types are not equal: {typeof(_first)} and {typeof(_second)}.",
+				__pass: false,
+				__msg: $"Supplied value types are not equal: {typeof(_first)} and {typeof(_second)}.",
 			}));
-			return;
+
+			return self;
 		}
+
 		if (_first == _second)
 		{
 			AddLog(new CrispyLog(self, {
-				pass: true,
+				__pass: true,
 			}));
 		}
 		else
 		{
 			AddLog(new CrispyLog(self, {
-				pass: false,
-				msg: _message,
-				helper_text: $"first and second are not equal: {_first}, {_second}",
+				__pass: false,
+				__msg: _message,
+				__helper_text: $"first and second are not equal: {_first}, {_second}",
 			}));
 		}
+
+		return self;
 	}
 
-	/// Test that first and second are not equal
+	/// @description Test that first and second are not equal
 	/// @param {Any} first - First type to check
 	/// @param {Any} second - Second type to check against
 	/// @param {String} [message] - Custom message to output on failure
+	/// @returns {Struct.CrispyCase} Self for chaining
 	static AssertNotEqual = function(_first, _second, _message)
 	{
 		// Check supplied arguments
@@ -119,35 +119,34 @@ function CrispyCase(_name, _func, _unpack = undefined) : CrispyTest(_name) const
 		{
 			show_error($"{instanceof(self)}.AssertNotEqual() expected 2 arguments, received {argument_count}.", true);
 		}
-		if (!is_string(_message) && !is_undefined(_message))
-		{
-			__crispy_error($"{instanceof(self)}.AssertNotEqual() \"message\" expected either a string or undefined, received {typeof(_message)}.");
-		}
-		var _outcome = (typeof(_first) != typeof(_second));
-		if (!_outcome)
-		{
-			_outcome = (_first != _second);
-		}
+
+		if (!__crispy_validate_message_param(instanceof(self), "AssertNotEqual", _message)) return self;
+		
+		var _outcome = (typeof(_first) != typeof(_second) );
+		if (!_outcome) { _outcome = (_first != _second); }
+
 		if (_outcome)
 		{
 			AddLog(new CrispyLog(self, {
-				pass: true,
+				__pass: true,
 			}));
 		}
 		else
 		{
 			AddLog(new CrispyLog(self, {
-				pass: false,
-				msg: _message,
-				helper_text: $"first and second are equal: {_first}, {_second}",
+				__pass: false,
+				__msg: _message,
+				__helper_text: $"first and second are equal: {_first}, {_second}",
 			}));
 		}
+
+		return self;
 	}
 
-	/// Test whether the provided expression is true
-	/// The test will first try to convert the expression to a boolean, then check if it equals true
+	/// @description Test whether the provided expression is true. The test will first try to convert the expression to a boolean, then check if it equals true
 	/// @param {Any} expr - Expression to check
 	/// @param {String} [message] - Custom message to output on failure
+	/// @returns {Struct.CrispyCase} Self for chaining
 	static AssertTrue = function(_expr, _message)
 	{
 		// Check supplied arguments
@@ -155,10 +154,8 @@ function CrispyCase(_name, _func, _unpack = undefined) : CrispyTest(_name) const
 		{
 			show_error($"{instanceof(self)}.AssertTrue() expected 1 argument, received {argument_count}.", true);
 		}
-		if (!is_string(_message) && !is_undefined(_message))
-		{
-			__crispy_error($"{instanceof(self)}.AssertTrue() \"message\" expected either a string or undefined, received {typeof(_message)}.");
-		}
+
+		if (!__crispy_validate_message_param(instanceof(self), "AssertTrue", _message)) return self;
 
 		try
 		{
@@ -167,31 +164,35 @@ function CrispyCase(_name, _func, _unpack = undefined) : CrispyTest(_name) const
 		catch (err)
 		{
 			AddLog(new CrispyLog(self, {
-				pass: false,
-				helper_text: $"Unable to convert {typeof(_expr)} into boolean. Cannot evaluate.",
+				__pass: false,
+				__helper_text: $"Unable to convert {typeof(_expr)} into boolean. Cannot evaluate.",
 			}));
-			return;
+			
+			return self;
 		}
+
 		if (_expr)
 		{
 			AddLog(new CrispyLog(self, {
-				pass: true,
+				__pass: true,
 			}));
 		}
 		else
 		{
 			AddLog(new CrispyLog(self, {
-				pass: false,
-				msg: _message,
-				helper_text: "Expression is not true.",
+				__pass: false,
+				__msg: _message,
+				__helper_text: "Expression is not true.",
 			}));
 		}
+		
+		return self;
 	}
 
-	/// Test whether the provided expression is false
-	/// The test will first try to convert the expression to a boolean, then check if it equals false
+	/// @description Test whether the provided expression is false. The test will first try to convert the expression to a boolean, then check if it equals false
 	/// @param {Any} expr - Expression to check
 	/// @param {String} [message] - Custom message to output on failure
+	/// @returns {Struct.CrispyCase} Self for chaining
 	static AssertFalse = function(_expr, _message)
 	{
 		// Check supplied arguments
@@ -199,10 +200,7 @@ function CrispyCase(_name, _func, _unpack = undefined) : CrispyTest(_name) const
 		{
 			show_error($"{instanceof(self)}.AssertFalse() expected 1 argument, received {argument_count}.", true);
 		}
-		if (!is_string(_message) && !is_undefined(_message))
-		{
-			__crispy_error($"{instanceof(self)}.AssertFalse() \"message\" expected either a string or undefined, received {typeof(_message)}.");
-		}
+		if (!__crispy_validate_message_param(instanceof(self), "AssertFalse", _message)) return self;
 
 		try
 		{
@@ -211,30 +209,35 @@ function CrispyCase(_name, _func, _unpack = undefined) : CrispyTest(_name) const
 		catch (err)
 		{
 			AddLog(new CrispyLog(self, {
-				pass: false,
-				helper_text: $"Unable to convert {typeof(_expr)} into boolean. Cannot evaluate.",
+				__pass: false,
+				__helper_text: $"Unable to convert {typeof(_expr)} into boolean. Cannot evaluate.",
 			}));
-			return;
+
+			return self;
 		}
+		
 		if (!_expr)
 		{
 			AddLog(new CrispyLog(self, {
-				pass: true,
+				__pass: true,
 			}));
 		}
 		else
 		{
 			AddLog(new CrispyLog(self, {
-				pass: false,
-				msg: _message,
-				helper_text: "Expression is not false.",
+				__pass: false,
+				__msg: _message,
+				__helper_text: "Expression is not false.",
 			}));
 		}
+
+		return self;
 	}
 
-	/// Test whether the provided expression is noone
+	/// @description Test whether the provided expression is noone
 	/// @param {Any} expr - Expression to check
 	/// @param {String} [message] - Custom message to output on failure
+	/// @returns {Struct.CrispyCase} Self for chaining
 	static AssertIsNoone = function(_expr, _message)
 	{
 		// Check supplied arguments
@@ -242,29 +245,30 @@ function CrispyCase(_name, _func, _unpack = undefined) : CrispyTest(_name) const
 		{
 			show_error($"{instanceof(self)}.AssertIsNoone() expected 1 argument, received {argument_count}.", true);
 		}
-		if (!is_string(_message) && !is_undefined(_message))
-		{
-			__crispy_error($"{instanceof(self)}.AssertIsNoone() \"message\" expected either a string or undefined, received {typeof(_message)}.");
-		}
+		if (!__crispy_validate_message_param(instanceof(self), "AssertIsNoone", _message)) return self;
+		
 		if (_expr == noone)
 		{
 			AddLog(new CrispyLog(self, {
-				pass: true,
+				__pass: true,
 			}));
 		}
 		else
 		{
 			AddLog(new CrispyLog(self, {
-				pass: false,
-				msg: _message,
-				helper_text: "Expression is not noone.",
+				__pass: false,
+				__msg: _message,
+				__helper_text: "Expression is not noone.",
 			}));
 		}
+
+		return self;
 	}
 
-	/// Test whether the provided expression is not noone
+	/// @description Test whether the provided expression is not noone
 	/// @param {Any} expr - Expression to check
 	/// @param {String} [message] - Custom message to output on failure
+	/// @returns {Struct.CrispyCase} Self for chaining
 	static AssertIsNotNoone = function(_expr, _message)
 	{
 		// Check supplied arguments
@@ -272,29 +276,30 @@ function CrispyCase(_name, _func, _unpack = undefined) : CrispyTest(_name) const
 		{
 			show_error($"{instanceof(self)}.AssertIsNotNoone() expected 1 argument, received {argument_count}.", true);
 		}
-		if (!is_string(_message) && !is_undefined(_message))
-		{
-			__crispy_error($"{instanceof(self)}.AssertIsNotNoone() \"message\" expected either a string or undefined, received {typeof(_message)}.");
-		}
+		if (!__crispy_validate_message_param(instanceof(self), "AssertIsNotNoone", _message)) return self;
+		
 		if (_expr != noone)
 		{
 			AddLog(new CrispyLog(self, {
-				pass: true,
+				__pass: true,
 			}));
 		}
 		else
 		{
 			AddLog(new CrispyLog(self, {
-				pass: false,
-				msg: _message,
-				helper_text: "Expression is noone.",
+				__pass: false,
+				__msg: _message,
+				__helper_text: "Expression is noone.",
 			}));
 		}
+
+		return self;
 	}
 
-	/// Test whether the provided expression is undefined
+	/// @description Test whether the provided expression is undefined
 	/// @param {Any} expr - Expression to check
 	/// @param {String} [message] - Custom message to output on failure
+	/// @returns {Struct.CrispyCase} Self for chaining
 	static AssertIsUndefined = function(_expr, _message)
 	{
 		// Check supplied arguments
@@ -302,29 +307,30 @@ function CrispyCase(_name, _func, _unpack = undefined) : CrispyTest(_name) const
 		{
 			show_error($"{instanceof(self)}.AssertIsUndefined() expected 1 argument, received {argument_count}.", true);
 		}
-		if (!is_string(_message) && !is_undefined(_message))
-		{
-			__crispy_error($"{instanceof(self)}.AssertIsUndefined() \"message\" expected either a string or undefined, received {typeof(_message)}.");
-		}
+		if (!__crispy_validate_message_param(instanceof(self), "AssertIsUndefined", _message)) return self;
+		
 		if (is_undefined(_expr))
 		{
 			AddLog(new CrispyLog(self, {
-				pass: true,
+				__pass: true,
 			}));
 		}
 		else
 		{
 			AddLog(new CrispyLog(self, {
-				pass: false,
-				msg: _message,
-				helper_text: "Expression is not undefined.",
+				__pass: false,
+				__msg: _message,
+				__helper_text: "Expression is not undefined.",
 			}));
 		}
+
+		return self;
 	}
 
-	/// Test whether the provided expression is not undefined
+	/// @description Test whether the provided expression is not undefined
 	/// @param {Any} expr - Expression to check
 	/// @param {String} [message] - Custom message to output on failure
+	/// @returns {Struct.CrispyCase} Self for chaining
 	static AssertIsNotUndefined = function(_expr, _message)
 	{
 		// Check supplied arguments
@@ -332,29 +338,30 @@ function CrispyCase(_name, _func, _unpack = undefined) : CrispyTest(_name) const
 		{
 			show_error($"{instanceof(self)}.AssertIsNotUndefined() expected 1 argument, received {argument_count}.", true);
 		}
-		if (!is_string(_message) && !is_undefined(_message))
-		{
-			__crispy_error($"{instanceof(self)}.AssertIsNotUndefined() \"message\" expected either a string or undefined, received {typeof(_message)}.");
-		}
+		if (!__crispy_validate_message_param(instanceof(self), "AssertIsNotUndefined", _message)) return self;
+		
 		if (!is_undefined(_expr))
 		{
 			AddLog(new CrispyLog(self, {
-				pass: true,
+				__pass: true,
 			}));
 		}
 		else
 		{
 			AddLog(new CrispyLog(self, {
-				pass: false,
-				msg: _message,
-				helper_text: "Expression is undefined.",
+				__pass: false,
+				__msg: _message,
+				__helper_text: "Expression is undefined.",
 			}));
 		}
+
+		return self;
 	}
 
-	/// Test whether the provided function will throw an error message
+	/// @description Test whether the provided function will throw an error message
 	/// @param {Function} func - Function to check whether it throws an error message
 	/// @param {String} [message] - Custom message to output on failure
+	/// @returns {Struct.CrispyCase} Self for chaining
 	static AssertRaises = function(_func, _message)
 	{
 		// Check supplied arguments
@@ -362,35 +369,37 @@ function CrispyCase(_name, _func, _unpack = undefined) : CrispyTest(_name) const
 		{
 			show_error($"{instanceof(self)}.AssertRaises() expected 1 argument, received {argument_count}.", true);
 		}
+
 		if (!is_method(_func))
 		{
 			__crispy_error($"{instanceof(self)}.AssertRaises() \"func\" expected a function, received {typeof(_func)}.");
 		}
-		if (!is_string(_message) && !is_undefined(_message))
-		{
-			__crispy_error($"{instanceof(self)}.AssertRaises() \"message\" expected either a string or undefined, received {typeof(_message)}.");
-		}
+		if (!__crispy_validate_message_param(instanceof(self), "AssertRaises", _message)) return self;
+		
 		try
 		{
 			_func();
 			AddLog(new CrispyLog(self, {
-				pass: false,
-				msg: _message,
-				helper_text: "Error message was not thrown.",
+				__pass: false,
+				__msg: _message,
+				__helper_text: "Error message was not thrown.",
 			}));
 		}
 		catch (err)
 		{
 			AddLog(new CrispyLog(self, {
-				pass: true,
+				__pass: true,
 			}));
 		}
+
+		return self;
 	}
 
-	/// Test the value of the error message thrown in the provided function
+	/// @description Test the value of the error message thrown in the provided function
 	/// @param {Function} func - Function ran to throw an error message
 	/// @param {String} value - Value of error message to check
 	/// @param {String} [message] - Custom message to output on failure
+	/// @returns {Struct.CrispyCase} Self for chaining
 	static AssertRaiseErrorValue = function(_func, _value, _message)
 	{
 		// Check supplied arguments
@@ -398,54 +407,59 @@ function CrispyCase(_name, _func, _unpack = undefined) : CrispyTest(_name) const
 		{
 			show_error($"{instanceof(self)}.AssertRaiseErrorValue() expected 2 arguments, received {argument_count}.", true);
 		}
+
 		if (!is_method(_func))
 		{
 			__crispy_error($"{instanceof(self)}.AssertRaiseErrorValue() \"func\" expected a function, received {typeof(_func)}.");
 		}
+		
 		if (!is_string(_value))
 		{
 			__crispy_error($"{instanceof(self)}.AssertRaiseErrorValue() \"value\" expected a string, received {typeof(_value)}.");
 		}
-		if (!is_string(_message) && !is_undefined(_message))
-		{
-			__crispy_error($"{instanceof(self)}.AssertRaiseErrorValue() \"message\" expected either a string or undefined, received {typeof(_message)}.");
-		}
+		
+		if (!__crispy_validate_message_param(instanceof(self), "AssertRaiseErrorValue", _message)) return self;
+		
 		try
 		{
 			_func();
 			AddLog(new CrispyLog(self, {
-				pass: false,
-				helper_text: "Error message was not thrown.",
+				__pass: false,
+				__helper_text: "Error message was not thrown.",
 			}));
 		}
 		catch (err)
 		{
 			// If the error message was thrown using show_error, use the
 			// message value from the exception struct for the assertion
-			if (is_struct(err) && variable_struct_exists(err, "message") && is_string(err.message))
+			if (is_struct(err) && struct_exists(err, "message") && is_string(err.message))
 			{
 				err = err.message;
 			}
+
 			if (err == _value)
 			{
 				AddLog(new CrispyLog(self, {
-					pass: true,
+					__pass: true,
 				}));
 			}
 			else
 			{
 				AddLog(new CrispyLog(self, {
-					pass: false,
-					msg: _message,
-					helper_text: $"Error message is not equal to value: \"{err}\" != \"{_value}\"",
+					__pass: false,
+					__msg: _message,
+					__helper_text: $"Error message is not equal to value: \"{err}\" != \"{_value}\"",
 				}));
 			}
 		}
+
+		return self;
 	}
 
-	/// Test whether the provided function runs without throwing an error
+	/// @description Test whether the provided function runs without throwing an error
 	/// @param {Function} func - Function to check whether it executes safely
 	/// @param {String} [message] - Custom message to output on failure
+	/// @returns {Struct.CrispyCase} Self for chaining
 	static AssertDoesNotThrow = function(_func, _message)
 	{
 		// Check supplied arguments
@@ -453,94 +467,98 @@ function CrispyCase(_name, _func, _unpack = undefined) : CrispyTest(_name) const
 		{
 			show_error($"{instanceof(self)}.AssertDoesNotThrow() expected 1 argument, received {argument_count}.", true);
 		}
+
 		if (!is_method(_func))
 		{
 			__crispy_error($"{instanceof(self)}.AssertDoesNotThrow() \"func\" expected a function, received {typeof(_func)}.");
 		}
-		if (!is_string(_message) && !is_undefined(_message))
-		{
-			__crispy_error($"{instanceof(self)}.AssertDoesNotThrow() \"message\" expected either a string or undefined, received {typeof(_message)}.");
-		}
+
+		if (!__crispy_validate_message_param(instanceof(self), "AssertDoesNotThrow", _message)) return self;
+		
 		try
 		{
 			_func();
 			AddLog(new CrispyLog(self, {
-				pass: true,
-				msg: _message,
+				__pass: true,
+				__msg: _message,
 			}));
 		}
 		catch (err)
 		{
 			AddLog(new CrispyLog(self, {
-				pass: false,
-				msg: _message,
-				helper_text: $"An unexpected error was thrown: {err}",
+				__pass: false,
+				__msg: _message,
+				__helper_text: $"An unexpected error was thrown: {err}",
 			}));
 		}
+
+		return self;
 	}
 
-	/// Function ran before test, used to set up test
-	/// @param {Function} [func] - Method to override __SetUp__ with
+	/// @description Function ran before test, used to set up test
+	/// @param {Function} [func] - Method to override __SetUp with
+	/// @returns {Struct.CrispyCase} Self for chaining
 	static SetUp = function()
 	{
 		if (argument_count > 0)
 		{
 			var _func = argument[0];
-			if (is_method(_func))
+			var _bound = __crispy_validate_and_bind_method(instanceof(self), "SetUp", _func);
+			if (!is_undefined(_bound))
 			{
-				__SetUp__ = method(self, _func);
-			}
-			else
-			{
-				__crispy_error($"{instanceof(self)}.SetUp() \"func\" expected a function, received {typeof(_func)}.");
+				__SetUp = _bound;
 			}
 		}
 		else
 		{
 			ClearLogs();
-			if (is_method(__SetUp__))
+			if (is_method(__SetUp))
 			{
-				__SetUp__();
+				__SetUp();
 			}
 		}
+
+		return self;
 	}
 
-	/// Function ran after test, used to clean up test
-	/// @param {Function} [func] - Method to override __TearDown__ with
+	/// @description Function ran after test, used to clean up test
+	/// @param {Function} [func] - Method to override __TearDown with
+	/// @returns {Struct.CrispyCase} Self for chaining
 	static TearDown = function()
 	{
 		if (argument_count > 0)
 		{
 			var _func = argument[0];
-			if (is_method(_func))
+			var _bound = __crispy_validate_and_bind_method(instanceof(self), "TearDown", _func);
+			if (!is_undefined(_bound))
 			{
-				__TearDown__ = method(self, _func);
-			}
-			else
-			{
-				__crispy_error($"{instanceof(self)}.TearDown() \"func\" expected a function, received {typeof(_func)}.");
+				__TearDown = _bound;
 			}
 		}
 		else
 		{
-			if (is_method(__TearDown__))
+			if (is_method(__TearDown))
 			{
-				__TearDown__();
+				__TearDown();
 			}
 		}
+		
+		return self;
 	}
 
-	/// Set of functions to run in order for the test
+	/// @description Set of functions to run in order for the test
 	static Run = function()
 	{
 		SetUp();
-		onRunBegin();
+		OnRunBegin();
+		
 		__test();
-		onRunEnd();
+
+		OnRunEnd();
 		TearDown();
 	}
 
-	/// Sets up a discovered script to use as the test
+	/// @description Sets up a discovered script to use as the test
 	/// @param {Real} script - Index ID of script
 	/// @ignore
 	static __Discover = function(_script)
@@ -549,10 +567,12 @@ function CrispyCase(_name, _func, _unpack = undefined) : CrispyTest(_name) const
 		{
 			__crispy_error($"{instanceof(self)}.__Discover() \"script\" expected a real number, received {typeof(_script)}.");
 		}
+
 		if (!script_exists(_script))
 		{
 			__crispy_error($"{instanceof(self)}.__Discover() asset of index {_script} is not a script function.");
 		}
+		
 		__discovered_script = _script;
 		__is_discovered = true;
 		__test = method(self, _script);
@@ -561,7 +581,6 @@ function CrispyCase(_name, _func, _unpack = undefined) : CrispyTest(_name) const
 	/// @returns {String}
 	static toString = function()
 	{
-		return $"<Crispy TestCase(\"{__name}\")>";
+		return $"<Crispy Case(\"{__name}\")>";
 	}
-
 }

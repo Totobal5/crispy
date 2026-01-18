@@ -36,6 +36,7 @@
     {"id":{"name":"crispy_Functions","path":"scripts/crispy_Functions/crispy_Functions.yy",},},
     {"id":{"name":"crispy_Log","path":"scripts/crispy_Log/crispy_Log.yy",},},
     {"id":{"name":"crispy_Runner","path":"scripts/crispy_Runner/crispy_Runner.yy",},},
+    {"id":{"name":"crispy_Self_Test","path":"scripts/crispy_Self_Test/crispy_Self_Test.yy",},},
     {"id":{"name":"crispy_Suite","path":"scripts/crispy_Suite/crispy_Suite.yy",},},
     {"id":{"name":"crispy_Test","path":"scripts/crispy_Test/crispy_Test.yy",},},
     {"id":{"name":"example_of_discoverable_tests","path":"scripts/example_of_discoverable_tests/example_of_discoverable_tests.yy",},},

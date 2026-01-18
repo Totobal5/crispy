@@ -1,73 +1,101 @@
-/**
- * Base constructor that test constructors will inherit from
- * @param {String} _name - Name of class
- **/
+/// @description Base constructor that test constructors will inherit from
+/// @param {String} name - Name of class
 function CrispyTest(_name) constructor
 {
-    static vars = {};
-    
-	name = undefined;
-	static setUp = undefined;
-	static __setUp__ = undefined;
-	static tearDown = undefined;
-	static __tearDown__ = undefined;
-	static __onRunBegin__ = undefined;
-	static __onRunEnd__ = undefined;
-	__mixin_struct_unpack();
-	setName(_name);
+	/// Shared static struct accessible across all Crispy constructors (Runner, Suite, Case)
+	/// Use this to store variables that need to be accessed across test hierarchy
+	/// Example: In Suite.SetUp(), set vars.hamburger = new Food(); then access in tests via parent.hamburger
+	/// @ignore
+	static vars = {};
+
+	/// @ignore
+	__name = undefined;
+	static SetUp = undefined;
+	static TearDown = undefined;
+
+	/// @ignore
+	static __SetUp = undefined;
+	/// @ignore
+	static __TearDown = undefined;
+	/// @ignore
+	static __OnRunBegin = undefined;
+	/// @ignore
+	static __OnRunEnd = undefined;
+
+	__struct_unpack = method(self, __crispy_struct_unpack);
+	
+	__SetName(_name);
+
+	// Getters
+
+	/// Get the name of this test
+	/// @returns {String} Name of the test
+	static GetName = function()
+	{
+		return __name;
+	}
 
 	// Methods
-	
-	/**
-	 * Set name of class object
-	 * @function setName
-	 * @param {String} _name - Name of the object
-	 */
-	static setName = function(_name) {
-		if !is_string(_name) {
-			throw(instanceof(self) + ".setName() \"_name\" expected a string, received " + typeof(_name) + ".");
+
+	/// @ignore
+	/// Set name of class object
+	/// @param {String} name - Name of the object
+	static __SetName = function(_name)
+	{
+		if (!is_string(_name))
+		{
+			__crispy_error($"{instanceof(self)}.__SetName() \"name\" expected a string, received {typeof(_name)}.");
 		}
-		name = _name;
+		__name = _name;
 	}
 
-	/**
-	 * Event to be called at the beginning of run
-	 * @function onRunBegin
-	 * @param {Function} [_func] - Method to override __onRunBegin__ with
-	 */
-	static onRunBegin = function() {
-		if argument_count > 0 {
+	/// Event to be called at the beginning of run
+	/// @param {Function} [func] - Method to override __OnRunBegin with
+	static OnRunBegin = function()
+	{
+		if (argument_count > 0)
+		{
 			var _func = argument[0];
-			if is_method(_func) {
-				__onRunBegin__ = method(self, _func);
-			} else {
-				throw(instanceof(self) + ".onRunBegin() \"_func\" expected a function, received " + typeof(_func) + ".");
+			if (is_method(_func))
+			{
+				__OnRunBegin = method(self, _func);
 			}
-		} else {
-			if is_method(__onRunBegin__) {
-				__onRunBegin__();
+			else
+			{
+				__crispy_error($"{instanceof(self)}.OnRunBegin() \"func\" expected a function, received {typeof(_func)}.");
+			}
+		}
+		else
+		{
+			if (is_method(__OnRunBegin))
+			{
+				__OnRunBegin();
 			}
 		}
 	}
 
-	/**
-	 * Event to be called at the end of run
-	 * @function onRunEnd
-	 * @param {Function} [_func] - Method to override __onRunEnd__ with
-	 */
-	static onRunEnd = function() {
-		if argument_count > 0 {
+	/// Event to be called at the end of run
+	/// @param {Function} [func] - Method to override __OnRunEnd with
+	static OnRunEnd = function()
+	{
+		if (argument_count > 0)
+		{
 			var _func = argument[0];
-			if is_method(_func) {
-				__onRunEnd__ = method(self, _func);
-			} else {
-				throw(instanceof(self) + ".onRunEnd() \"_func\" expected a function, received " + typeof(_func) + ".");
+			if (is_method(_func))
+			{
+				__OnRunEnd = method(self, _func);
 			}
-		} else {
-			if is_method(__onRunEnd__) {
-				__onRunEnd__();
+			else
+			{
+				__crispy_error($"{instanceof(self)}.OnRunEnd() \"func\" expected a function, received {typeof(_func)}.");
+			}
+		}
+		else
+		{
+			if (is_method(__OnRunEnd))
+			{
+				__OnRunEnd();
 			}
 		}
 	}
-
 }

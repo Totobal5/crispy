@@ -1,25 +1,30 @@
-// Create TestRunner
-runner = new TestRunner("runner");
-// Update runner to output test results to Output Window and results ds_list
-runner.output = function(_message) {
+// Create CrispyRunner
+runner = new CrispyRunner("runner");
+
+// Test results list
+results = ds_list_create();
+results_max = 255;
+
+// Override Output to save results to ds_list
+runner.__Output = method(self, function(_message) {
 	show_debug_message(_message);
 	ds_list_insert(results, 0, _message);
-	while ds_list_size(results) > results_max {
+	while (ds_list_size(results) > results_max) {
 		ds_list_delete(results, results_max - 1);
 	}
-}
+});
 
-// Create GUI elements TestSuite
-gui_test_suite = new TestSuite("gui_suite");
-// Add GUI elements TestSuite to TestRunner
-runner.addTestSuite(gui_test_suite);
+// Create GUI elements CrispySuite
+gui_test_suite = new CrispySuite("gui_suite");
+// Add GUI elements CrispySuite to CrispyRunner
+runner.AddTestSuite(gui_test_suite);
 // Discover GUI element tests
-runner.discover(gui_test_suite, "test_gui_box");
+runner.Discover(gui_test_suite, "test_gui_box");
 
-// Create hamburger TestSuite
-hamburger_suite = new TestSuite("hamburger_suite");
+// Create hamburger CrispySuite
+hamburger_suite = new CrispySuite("hamburger_suite");
 // Set up hamburger for tests
-hamburger_suite.setUp(function() {
+hamburger_suite.SetUp(function() {
 	var _ingredients = [
 		new Ingredient("bun"),
 		new Ingredient("pickles", true),
@@ -28,19 +33,27 @@ hamburger_suite.setUp(function() {
 		new Ingredient("patty"),
 		new Ingredient("bun")
 	];
-	hamburger = new Food("hamburger", _ingredients);
+	CrispyTest.vars.hamburger = new Food("hamburger", _ingredients);
 });
-// Add hamburger TestSuite to TestRunner
-runner.addTestSuite(hamburger_suite);
-// Discovering hamburger tests
-runner.discover(hamburger_suite, "test_hamburger_");
 
-// Create Food TestSuite
-food_suite = new TestSuite("food_suite");
-// Add Food TestSuite to TestRunner
-runner.addTestSuite(food_suite);
+// Add hamburger CrispySuite to CrispyRunner
+runner.AddTestSuite(hamburger_suite);
+// Discovering hamburger tests
+runner.Discover(hamburger_suite, "test_hamburger_");
+
+// Create Food CrispySuite
+food_suite = new CrispySuite("food_suite");
+// Add Food CrispySuite to CrispyRunner
+runner.AddTestSuite(food_suite);
 // Discovering Food tests
-runner.discover(food_suite, "test_food_");
+runner.Discover(food_suite, "test_food_");
+
+// Create Crispy Self Test CrispySuite
+crispy_self_test_suite = new CrispySuite("crispy_self_test_suite");
+// Add Crispy Self Test CrispySuite to CrispyRunner
+runner.AddTestSuite(crispy_self_test_suite);
+// Discovering Crispy Self Tests
+runner.Discover(crispy_self_test_suite, "test_crispy_");
 
 // Flag for running tests
 can_run_tests = true;
@@ -59,8 +72,6 @@ info_box = new GuiBox(1, 1, room_width - 2, padding * 2 + string_height(info_tex
 scroll_position = 0;
 text_height = string_height("W");
 
-results = ds_list_create();
-results_max = 255;
 results_box = new GuiBox(info_box.x1, info_box.y2 + 3, info_box.x2, room_height - 2);
 
 

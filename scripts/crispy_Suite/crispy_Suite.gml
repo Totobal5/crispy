@@ -1,108 +1,109 @@
-// Feather disable all
-
-/**
- * Testing suite that holds tests
- * @param {String} _name - Name of suite
- * @param {Struct} [_unpack=undefined] - Struct for crispyStructUnpack
- */
-function CrispySuite(_name, _unpack=undefined) : CrispyTest(_name) constructor 
+/// @description Testing suite that holds tests
+/// @param {String} name - Name of suite
+/// @param {Struct} [unpack=undefined] - Struct for crispy_struct_unpack
+function CrispySuite(_name, _unpack = undefined) : CrispyTest(_name) constructor 
 {
-	parent = undefined;
-	tests = [];
+	/// @ignore
+	__parent = undefined;
 
-	/**
-	 * Run struct unpacker if unpack argument was provided
-	 * Stays after all variables are initialized so they may be overwritten
-	 */
-	if !is_undefined(_unpack) {
-		if is_struct(_unpack) {
-			crispyStructUnpack(_unpack);
-		} else {
-			throw(instanceof(self) + " \"_unpack\" expected a struct or undefined, recieved " + typeof(_unpack) + ".");
-		}
-	}
+	/// @ignore
+	__tests = [];
 
-	// Methods
+	/// Run struct unpacker if unpack argument was provided
+	/// Stays after all variables are initialized so they may be overwritten
+	__crispy_validate_unpack_param(instanceof(self), "", _unpack);
 
-	/**
-	 * Adds TestCase to array of cases
-	 * @function addTestCase
-	 * @param {Struct} _test_case - TestCase to add
-	 */
-	static addTestCase = function(_test_case) {
-		if instanceof(_test_case) != "TestCase" {
+	#region METHODS
+
+	/// @description Adds CrispyCase to array of cases
+	/// @param {Struct} test_case - CrispyCase to add
+	/// @returns {Struct.CrispySuite} Self for chaining
+	static AddCase = function(_test_case)
+	{
+		if (instanceof(_test_case) != "CrispyCase")
+		{
 			var _type = !is_undefined(instanceof(_test_case)) ? instanceof(_test_case) : typeof(_test_case);
-			throw(instanceof(self) + ".addTestCase() \"_test_case\" expected an instance of TestCase, received " + _type + ".");
+			__crispy_error($"{instanceof(self)}.AddCase() \"_test_case\" expected an instance of CrispyCase, received {_type}.");
 		}
-		_test_case.parent = self;
-		array_push(tests, _test_case);
+		_test_case.__parent = self;
+		array_push(__tests, _test_case);
+
+		return self;
 	}
 
-	/**
-	 * Event that runs before all tests to set up variables
-	 * Can also overwrite __setUp__
-	 * @function setUp
-	 * @param {Function} [_func] - Function to overwrite __setUp__
-	 */
-	static setUp = function() {
-		if argument_count > 0 {
+	/// @description Event that runs before all tests to set up variables. Can also overwrite __SetUp
+	/// @param {Function} [_func] - Function to overwrite __SetUp
+	/// @return {Struct.CrispySuite} Self for chaining
+	static SetUp = function()
+	{
+		if (argument_count > 0)
+		{
 			var _func = argument[0];
-			if is_method(_func) {
-				__setUp__ = method(self, _func);
-			} else {
-				throw(instanceof(self) + ".setUp() \"_func\" expected a function, received " + typeof(_func) + ".");
-			}
-		} else {
-			if is_method(__setUp__) {
-				__setUp__();
+			var _bound = __crispy_validate_and_bind_method(instanceof(self), "SetUp", _func);
+			if (!is_undefined(_bound))
+			{
+				__SetUp = _bound;
 			}
 		}
+		else
+		{
+			if (is_method(__SetUp))
+			{
+				__SetUp();
+			}
+		}
+
+		return self;
 	}
 
-	/**
-	 * Event that runs after all tests to clean up variables
-	 * Can also overwrite __tearDown__
-	 * @function tearDown
-	 * @param {Function} [_func] - Function to overwrite __tearDown__
-	 */
-	static tearDown = function() {
-		if argument_count > 0 {
+	/// @description Event that runs after all tests to clean up variables. Can also overwrite __TearDown
+	/// @param {Function} [_func] - Function to overwrite __TearDown
+	/// @return {Struct.CrispySuite} Self for chaining
+	static TearDown = function()
+	{
+		if (argument_count > 0)
+		{
 			var _func = argument[0];
-			if is_method(_func) {
-				__tearDown__ = method(self, _func);
-			} else {
-				throw(instanceof(self) + ".tearDown() \"_func\" expected a function, received " + typeof(_func) + ".");
-			}
-		} else {
-			if is_method(__tearDown__) {
-				__tearDown__();
+			var _bound = __crispy_validate_and_bind_method(instanceof(self), "TearDown", _func);
+			if (!is_undefined(_bound))
+			{
+				__TearDown = _bound;
 			}
 		}
-	}
-
-	/**
-	 * Runs tests
-	 * @function run
-	 */
-	static run = function() {
-		setUp();
-		var _len = array_length(tests);
-		var i = 0;
-		repeat (_len) {
-			onRunBegin();
-			tests[i].run();
-			onRunEnd();
-			++i;
+		else
+		{
+			if (is_method(__TearDown))
+			{
+				__TearDown();
+			}
 		}
-		tearDown();
+
+		return self;
 	}
 
-	/**
-	 * @function toString
-	 * @returns {String}
-	 */
-	static toString = function() {
-		return "<Crispy TestSuite(\"" + name + "\")>";
+	/// @description Runs tests
+	/// @returns {Void}
+	static Run = function()
+	{
+		SetUp();
+
+		var i = 0; repeat(array_length(__tests) )
+		{
+			OnRunBegin();
+			
+			__tests[i++].Run();
+			
+			OnRunEnd();
+		}
+
+		TearDown();
 	}
 
+	/// @returns {String}
+	static toString = function()
+	{
+		return $"<Crispy Suite(\"{__name}\")>";
+	}
+
+	#endregion
 }
