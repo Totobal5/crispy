@@ -24,7 +24,7 @@ function TestRunner(_name, _unpack=undefined) : BaseTestClass(_name) constructor
 		if is_struct(_unpack) {
 			crispyStructUnpack(_unpack);
 		} else {
-			throw(instanceof(self) + " \"_unpack\" expected a Struct or Undefined, recieved " + typeof(_unpack) + ".");
+			throw(instanceof(self) + " \"_unpack\" expected a struct or undefined, recieved " + typeof(_unpack) + ".");
 		}
 	}
 
@@ -34,18 +34,15 @@ function TestRunner(_name, _unpack=undefined) : BaseTestClass(_name) constructor
 	 * Adds a Log to the array of logs
 	 * @function addLog
 	 * @param {Struct} _log - Log struct to add to logs
-	 * @returns {Struct.TestRunner}
 	 */
 	static addLog = function(_log) {
 		array_push(logs, _log);
-		return self;
 	}
 
 	/**
 	 * Adds Logs to the array of logs
 	 * @function captureLogs
 	 * @param {Struct} _input - Adds logs of the input to logs
-	 * @returns {Struct.TestRunner}
 	 */
 	static captureLogs = function(_input) {
 		var i, _logs_len;
@@ -79,14 +76,12 @@ function TestRunner(_name, _unpack=undefined) : BaseTestClass(_name) constructor
 				throw(instanceof(self) + ".captureLogs() \"_input\" expected an instance of either CrispyLog, TestCase, or TestSuite, received " + _type + ".");
 				break;
 		}
-		return self;
 	}
 
 	/**
 	 * Adds TestSuite to array of suites
 	 * @function addTestSuite
 	 * @param {Struct} _test_suite - TestSuite to add
-	 * @returns {Struct.TestRunner}
 	 */
 	static addTestSuite = function(_test_suite) {
 		if instanceof(_test_suite) != "TestSuite" {
@@ -95,7 +90,6 @@ function TestRunner(_name, _unpack=undefined) : BaseTestClass(_name) constructor
 		}
 		_test_suite.parent = self;
 		array_push(suites, _test_suite);
-		return self;
 	}
 
 	/**
@@ -107,10 +101,10 @@ function TestRunner(_name, _unpack=undefined) : BaseTestClass(_name) constructor
 	 */
 	static hr = function(_str="-", _count=70) {
 		if !is_string(_str) {
-			throw(instanceof(self) + ".hr() \"_str\" expected a String, received " + typeof(_str) + ".");
+			throw(instanceof(self) + ".hr() \"_str\" expected a string, received " + typeof(_str) + ".");
 		}
 		if !is_real(_count) {
-			throw(instanceof(self) + ".hr() \"_count\" expected a Number, received " + typeof(_count) + ".");
+			throw(instanceof(self) + ".hr() \"_count\" expected a real number, received " + typeof(_count) + ".");
 		}
 		var _hr = "";
 		repeat(_count) {
@@ -122,9 +116,8 @@ function TestRunner(_name, _unpack=undefined) : BaseTestClass(_name) constructor
 	/**
 	 * Runs test suites and logs results
 	 * @function run
-	 * @returns {Struct.TestRunner}
 	 */
-	static run = function() {
+  	static run = function() {
 		setUp();
 		var _len = array_length(suites);
 		var i = 0;
@@ -136,14 +129,12 @@ function TestRunner(_name, _unpack=undefined) : BaseTestClass(_name) constructor
 			++i;
 		}
 		tearDown();
-		return self;
 	}
 
 	/**
 	 * Clears logs, starts timer, and runs __setUp__
 	 * @function setUp
 	 * @param {Function} [_func] - Method to override __setUp__ with
-	 * @returns {Struct.TestRunner}
 	 */
 	static setUp = function() {
 		if argument_count > 0 {
@@ -151,7 +142,7 @@ function TestRunner(_name, _unpack=undefined) : BaseTestClass(_name) constructor
 			if is_method(_func) {
 				__setUp__ = method(self, _func);
 			} else {
-				throw(instanceof(self) + ".setUp() \"_func\" expected a Function, received " + typeof(_func) + ".");
+				throw(instanceof(self) + ".setUp() \"_func\" expected a function, received " + typeof(_func) + ".");
 			}
 		} else {
 			logs = [];
@@ -160,14 +151,12 @@ function TestRunner(_name, _unpack=undefined) : BaseTestClass(_name) constructor
 				__setUp__();
 			}
 		}
-		return self;
 	}
 
 	/**
 	 * Function ran after test, used to clean up test
 	 * @function tearDown
 	 * @param {Function} [_func] - Method to override __tearDown__ with
-	 * @returns {Struct.TestRunner}
 	 */
 	static tearDown = function() {
 		if argument_count > 0 {
@@ -175,7 +164,7 @@ function TestRunner(_name, _unpack=undefined) : BaseTestClass(_name) constructor
 			if is_method(_func) {
 				__tearDown__ = method(self, _func);
 			} else {
-				throw(instanceof(self) + ".tearDown() \"_func\" expected a Function, received " + typeof(_func) + ".");
+				throw(instanceof(self) + ".tearDown() \"_func\" expected a function, received " + typeof(_func) + ".");
 			}
 		} else {
 			if CRISPY_DEBUG && CRISPY_SILENCE_PASSING_TESTS_OUTPUT {
@@ -243,7 +232,7 @@ function TestRunner(_name, _unpack=undefined) : BaseTestClass(_name) constructor
 			}
 			
 		}
-		return self;
+
 	}
 
 	/**
@@ -254,11 +243,10 @@ function TestRunner(_name, _unpack=undefined) : BaseTestClass(_name) constructor
 	 * 		discovered test script to, else create a temporary TestSuite
 	 * @param {String} [_script_start_pattern="test_"] - String that script
 	 * 		functions need to start with in order to be discoverable
-	 * @returns {Struct.TestRunner}
 	 */
 	static discover = function(_test_suite, _script_start_pattern="test_") {
 		if !is_string(_script_start_pattern) {
-			throw(instanceof(self) + ".discover() \"_script_start_pattern\" expected a String, received " + typeof(_script_start_pattern) + ".");
+			throw(instanceof(self) + ".discover() \"_script_start_pattern\" expected a string, received " + typeof(_script_start_pattern) + ".");
 		}
 
 		// Cache all script functions
@@ -306,7 +294,7 @@ function TestRunner(_name, _unpack=undefined) : BaseTestClass(_name) constructor
 		// Throw error if function pattern is an empty string
 		var _pattern_len = string_length(_script_start_pattern);
 		if _pattern_len == 0 {
-			throw(instanceof(self) + ".discover() \"_script_start_pattern\" cannot be an empty string.");
+			show_error(instanceof(self) + ".discover() \"script_start_pattern\" cannot be an empty string.", true);
 		}
 		
 		// Get the discovered scripts that match the script start pattern
@@ -340,8 +328,6 @@ function TestRunner(_name, _unpack=undefined) : BaseTestClass(_name) constructor
 				}
 			}
 		}
-
-		return self;
 	}
 
 	/**
@@ -349,7 +335,6 @@ function TestRunner(_name, _unpack=undefined) : BaseTestClass(_name) constructor
 	 * @function output
 	 * @param {String|Function} _input - String to output or function to
 	 * 		overwrite __output__
-	 * @returns {Struct.TestRunner}
 	 */
 	static output = function() {
 		var _input = (argument_count > 0) ? argument[0] : undefined;
@@ -368,7 +353,6 @@ function TestRunner(_name, _unpack=undefined) : BaseTestClass(_name) constructor
 		} else {
 			throw(instanceof(self) + ".output() expected 1 argument, received " + string(argument_count) + " argument(s).");
 		}
-		return self;
 	}
 
 	/**

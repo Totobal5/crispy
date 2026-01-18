@@ -6,6 +6,7 @@
 #macro CRISPY_VERSION "1.9.0" // major.minor.patch
 #macro CRISPY_DATE "2025-11-26" // yyyy-mm-dd
 
+#macro CRISPY_RUN true // Boolean flag that can be used to automatically run tests
 #macro CRISPY_DEBUG false // Enables outputting extra context on some silent functions
 #macro CRISPY_VERBOSITY 2 // Determines how verbose assertion outputs will be. Acceptable values are 0, 1, or 2
 

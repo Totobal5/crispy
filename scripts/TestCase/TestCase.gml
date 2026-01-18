@@ -10,7 +10,7 @@
 function TestCase(_name, _func, _unpack=undefined) : BaseTestClass(_name) constructor {
 
 	if !is_method(_func) {
-		throw(instanceof(self) + " \"_func\" expected a Function, received " + typeof(_func) + ".");
+		throw(instanceof(self) + " \"func\" expected a function, received " + typeof(_func) + ".");
 	}
 
 	class = instanceof(self);
@@ -28,7 +28,7 @@ function TestCase(_name, _func, _unpack=undefined) : BaseTestClass(_name) constr
 		if is_struct(_unpack) {
 			crispyStructUnpack(_unpack);
 		} else {
-			throw(instanceof(self) + " \"_unpack\" expected a Struct or Undefined, recieved " + typeof(_unpack) + ".");
+			throw(instanceof(self) + " \"_unpack\" expected a struct or undefined, recieved " + typeof(_unpack) + ".");
 		}
 	}
 
@@ -38,24 +38,20 @@ function TestCase(_name, _func, _unpack=undefined) : BaseTestClass(_name) constr
 	 * Adds a Log to the array of logs
 	 * @function addLog
 	 * @param {Struct} _log - Log struct
-	 * @returns {Struct.TestCase}
 	 */
 	static addLog = function(_log) {
 		if !is_struct(_log) {
-			throw(instanceof(self) + ".addLog() \"_log\" expected a Struct, recieved " + typeof(_log) + ".");
+			throw(instanceof(self) + ".addLog() \"_log\" expected a struct, recieved " + typeof(_log) + ".");
 		}
 		array_push(logs, _log);
-		return self;
 	}
 
 	/**
 	 * Clears array of Logs
 	 * @function clearLogs
-	 * @returns {Struct.TestCase}
 	 */
 	static clearLogs = function() {
 		logs = [];
-		return self;
 	}
 
 	/**
@@ -64,10 +60,13 @@ function TestCase(_name, _func, _unpack=undefined) : BaseTestClass(_name) constr
 	 * @function assertEqual
 	 * @param {Any} _first - First value
 	 * @param {Any} _second - Second value to check against _first
-	 * @param {String} [_message=undefined] - Custom message to output on failure
+	 * @param {String} [_message] - Custom message to output on failure
 	 */
-	static assertEqual = function(_first, _second, _message=undefined) {
+	static assertEqual = function(_first, _second, _message) {
 		// Check supplied arguments
+		if argument_count < 2 {
+			show_error(instanceof(self) + ".assertEqual() expected 2 arguments, recieved " + string(argument_count) + ".", true);
+		}
 		if !is_string(_message) && !is_undefined(_message) {
 			throw(instanceof(self) + ".assertEqual() \"_message\" expected either a string or undefined, received " + typeof(_message) + ".");
 		}
@@ -97,10 +96,13 @@ function TestCase(_name, _func, _unpack=undefined) : BaseTestClass(_name) constr
 	 * @function assertNotEqual
 	 * @param {Any} _first - First type to check
 	 * @param {Any} _second - Second type to check against
-	 * @param {String} [_message=undefined] - Custom message to output on failure
+	 * @param {String} [_message] - Custom message to output on failure
 	 */
-	static assertNotEqual = function(_first, _second, _message=undefined) {
+	static assertNotEqual = function(_first, _second, _message) {
 		// Check supplied arguments
+		if argument_count < 2 {
+			show_error(instanceof(self) + ".assertNotEqual() expected 2 arguments, recieved " + string(argument_count) + ".", true);
+		}
 		if !is_string(_message) && !is_undefined(_message) {
 			throw(instanceof(self) + ".assertNotEqual() \"_message\" expected either a string or undefined, received " + typeof(_message) + ".");
 		}
@@ -126,10 +128,13 @@ function TestCase(_name, _func, _unpack=undefined) : BaseTestClass(_name) constr
 	 * The test will first try to convert the expression to a boolean, then check if it equals true
 	 * @function assertTrue
 	 * @param {Any} _expr - Expression to check
-	 * @param {String} [_message=undefined] - Custom message to output on failure
+	 * @param {String} [_message] - Custom message to output on failure
 	 */
-	static assertTrue = function(_expr, _message=undefined) {
+	static assertTrue = function(_expr, _message) {
 		// Check supplied arguments
+		if argument_count < 1 {
+			show_error(instanceof(self) + ".assertTrue() expected 1 argument, recieved " + string(argument_count) + ".", true);
+		}
 		if !is_string(_message) && !is_undefined(_message) {
 			throw(instanceof(self) + ".assertTrue() \"_message\" expected either a string or undefined, received " + typeof(_message) + ".");
 		}
@@ -162,10 +167,13 @@ function TestCase(_name, _func, _unpack=undefined) : BaseTestClass(_name) constr
 	 * The test will first try to convert the expression to a boolean, then check if it equals false
 	 * @function assertFalse
 	 * @param {Any} _expr - Expression to check
-	 * @param {String} [_message=undefined] - Custom message to output on failure
+	 * @param {String} [_message] - Custom message to output on failure
 	 */
-	static assertFalse = function(_expr, _message=undefined) {
+	static assertFalse = function(_expr, _message) {
 		// Check supplied arguments
+		if argument_count < 1 {
+			show_error(instanceof(self) + ".assertFalse() expected 1 argument, recieved " + string(argument_count) + ".", true);
+		}
 		if !is_string(_message) && !is_undefined(_message) {
 			throw(instanceof(self) + ".assertFalse() \"_message\" expected either a string or undefined, received " + typeof(_message) + ".");
 		}
@@ -197,10 +205,13 @@ function TestCase(_name, _func, _unpack=undefined) : BaseTestClass(_name) constr
 	 * Test whether the provided expression is noone
 	 * @function assertIsNoone
 	 * @param {Any} _expr - Expression to check
-	 * @param {String} [_message=undefined] - Custom message to output on failure
+	 * @param {String} [_message] - Custom message to output on failure
 	 */
-	static assertIsNoone = function(_expr, _message=undefined) {
+	static assertIsNoone = function(_expr, _message) {
 		// Check supplied arguments
+		if argument_count < 1 {
+			show_error(instanceof(self) + ".assertIsNoone() expected 1 argument, recieved " + string(argument_count) + ".", true);
+		}
 		if !is_string(_message) && !is_undefined(_message) {
 			throw(instanceof(self) + ".assertIsNoone() \"_message\" expected either a string or undefined, received " + typeof(_message) + ".");
 		}
@@ -221,10 +232,13 @@ function TestCase(_name, _func, _unpack=undefined) : BaseTestClass(_name) constr
 	 * Test whether the provided expression is not noone
 	 * @function assertIsNotNoone
 	 * @param {Any} _expr - Expression to check
-	 * @param {String} [_message=undefined] - Custom message to output on failure
+	 * @param {String} [_message] - Custom message to output on failure
 	 */
-	static assertIsNotNoone = function(_expr, _message=undefined) {
+	static assertIsNotNoone = function(_expr, _message) {
 		// Check supplied arguments
+		if argument_count < 1 {
+			show_error(instanceof(self) + ".assertIsNotNoone() expected 1 argument, recieved " + string(argument_count) + ".", true);
+		}
 		if !is_string(_message) && !is_undefined(_message) {
 			throw(instanceof(self) + ".assertIsNotNoone() \"_message\" expected either a string or undefined, received " + typeof(_message) + ".");
 		}
@@ -245,10 +259,13 @@ function TestCase(_name, _func, _unpack=undefined) : BaseTestClass(_name) constr
 	 * Test whether the provided expression is undefined
 	 * @function assertIsUndefined
 	 * @param {Any} _expr - Expression to check
-	 * @param {String} [_message=undefined] - Custom message to output on failure
+	 * @param {String} [_message] - Custom message to output on failure
 	 */
-	static assertIsUndefined = function(_expr, _message=undefined) {
+	static assertIsUndefined = function(_expr, _message) {
 		// Check supplied arguments
+		if argument_count < 1 {
+			show_error(instanceof(self) + ".assertIsUndefined() expected 1 argument, recieved " + string(argument_count) + ".", true);
+		}
 		if !is_string(_message) && !is_undefined(_message) {
 			throw(instanceof(self) + ".assertIsUndefined() \"_message\" expected either a string or undefined, received " + typeof(_message) + ".");
 		}
@@ -269,10 +286,13 @@ function TestCase(_name, _func, _unpack=undefined) : BaseTestClass(_name) constr
 	 * Test whether the provided expression is not undefined
 	 * @function assertIsNotUndefined
 	 * @param {Any} _expr - Expression to check
-	 * @param {String} [_message=undefined] - Custom message to output on failure
+	 * @param {String} [_message] - Custom message to output on failure
 	 */
-	static assertIsNotUndefined = function(_expr, _message=undefined) {
+	static assertIsNotUndefined = function(_expr, _message) {
 		// Check supplied arguments
+		if argument_count < 1 {
+			show_error(instanceof(self) + ".assertIsNotUndefined() expected 1 argument, recieved " + string(argument_count) + ".", true);
+		}
 		if !is_string(_message) && !is_undefined(_message) {
 			throw(instanceof(self) + ".assertIsNotUndefined() \"_message\" expected either a string or undefined, received " + typeof(_message) + ".");
 		}
@@ -293,12 +313,15 @@ function TestCase(_name, _func, _unpack=undefined) : BaseTestClass(_name) constr
 	 * Test whether the provided function will throw an error message
 	 * @function assertRaises
 	 * @param {Function} _func - Function to check whether it throws an error message
-	 * @param {String} [_message=undefined] - Custom message to output on failure
+	 * @param {String} [_message] - Custom message to output on failure
 	 */
-	static assertRaises = function(_func, _message=undefined) {
+	static assertRaises = function(_func, _message) {
 		// Check supplied arguments
+		if argument_count < 1 {
+			show_error(instanceof(self) + ".assertRaises() expected 1 argument, recieved " + string(argument_count) + ".", true);
+		}
 		if !is_method(_func) {
-			throw(instanceof(self) + ".assertRaises() \"_func\" expected a Function, received " + typeof(_func) + ".");
+			throw(instanceof(self) + ".assertRaises() \"_func\" expected a function, received " + typeof(_func) + ".");
 		}
 		if !is_string(_message) && !is_undefined(_message) {
 			throw(instanceof(self) + ".assertRaises() \"_message\" expected either a string or undefined, received " + typeof(_message) + ".");
@@ -323,15 +346,18 @@ function TestCase(_name, _func, _unpack=undefined) : BaseTestClass(_name) constr
 	 * @function assertRaiseErrorValue
 	 * @param {Function} _func - Function ran to throw an error message
 	 * @param {String} _value - Value of error message to check
-	 * @param {String} [_message=undefined] - Custom message to output on failure
+	 * @param {String} [_message] - Custom message to output on failure
 	 */
-	static assertRaiseErrorValue = function(_func, _value, _message=undefined) {
+	static assertRaiseErrorValue = function(_func, _value, _message) {
 		// Check supplied arguments
+		if argument_count < 2 {
+			show_error(instanceof(self) + ".assertRaiseErrorValue() expected 2 arguments, recieved " + string(argument_count) + ".", true);
+		}
 		if !is_method(_func) {
-			throw(instanceof(self) + ".assertRaiseErrorValue() \"_func\" expected a Function, received " + typeof(_func) + ".");
+			throw(instanceof(self) + ".assertRaiseErrorValue() \"_func\" expected a function, received " + typeof(_func) + ".");
 		}
 		if !is_string(_value) {
-			throw(instanceof(self) + ".assertRaiseErrorValue() \"_value\" expected a String, received " + typeof(_value) + ".");
+			throw(instanceof(self) + ".assertRaiseErrorValue() \"_value\" expected a string, received " + typeof(_value) + ".");
 		}
 		if !is_string(_message) && !is_undefined(_message) {
 			throw(instanceof(self) + ".assertRaiseErrorValue() \"_message\" expected either a string or undefined, received " + typeof(_message) + ".");
@@ -400,7 +426,6 @@ function TestCase(_name, _func, _unpack=undefined) : BaseTestClass(_name) constr
 	 * Function ran before test, used to set up test
 	 * @function setUp
 	 * @param {Function} [_func] - Method to override __setUp__ with
-	 * @returns {Struct.TestCase}
 	 */
 	static setUp = function() {
 		if argument_count > 0 {
@@ -408,7 +433,7 @@ function TestCase(_name, _func, _unpack=undefined) : BaseTestClass(_name) constr
 			if is_method(_func) {
 				__setUp__ = method(self, _func);
 			} else {
-				throw(instanceof(self) + ".setUp() \"_func\" expected a Function, received " + typeof(_func) + ".");
+				throw(instanceof(self) + ".setUp() \"_func\" expected a function, received " + typeof(_func) + ".");
 			}
 		} else {
 			clearLogs();
@@ -416,14 +441,12 @@ function TestCase(_name, _func, _unpack=undefined) : BaseTestClass(_name) constr
 				__setUp__();
 			}
 		}
-		return self;
 	}
 	
 	/**
 	 * Function ran after test, used to clean up test
 	 * @function tearDown
 	 * @param {Function} [_func] - Method to override __tearDown__ with
-	 * @returns {Struct.TestCase}
 	 */
 	static tearDown = function() {
 		if argument_count > 0 {
@@ -431,20 +454,18 @@ function TestCase(_name, _func, _unpack=undefined) : BaseTestClass(_name) constr
 			if is_method(_func) {
 				__tearDown__ = method(self, _func);
 			} else {
-				throw(instanceof(self) + ".tearDown() \"_func\" expected a Function, received " + typeof(_func) + ".");
+				throw(instanceof(self) + ".tearDown() \"_func\" expected a function, received " + typeof(_func) + ".");
 			}
 		} else {
 			if is_method(__tearDown__) {
 				__tearDown__();
 			}
 		}
-		return self;
 	}
 
 	/**
 	 * Set of functions to run in order for the test
 	 * @function run
-	 * @returns {Struct.TestCase}
 	 */
 	static run = function() {
 		setUp();
@@ -452,7 +473,6 @@ function TestCase(_name, _func, _unpack=undefined) : BaseTestClass(_name) constr
 		test();
 		onRunEnd();
 		tearDown();
-		return self;
 	}
 
 	/**
@@ -460,11 +480,10 @@ function TestCase(_name, _func, _unpack=undefined) : BaseTestClass(_name) constr
 	 * @function __discover__
 	 * @param {Real} _script - Index ID of script
 	 * @ignore
-	 * @returns {Struct.TestCase}
 	 */
 	static __discover__ = function(_script) {
 		if !is_real(_script) {
-			throw(instanceof(self) + ".__discover__() \"_script\" expected a Number, received " + typeof(_script) + ".");
+			throw(instanceof(self) + ".__discover__() \"_script\" expected a real number, received " + typeof(_script) + ".");
 		}
 		if !script_exists(_script) {
 			throw(instanceof(self) + ".__discover__() asset of index " + string(_script) + " is not a script function.");
@@ -472,7 +491,6 @@ function TestCase(_name, _func, _unpack=undefined) : BaseTestClass(_name) constr
 		__discovered_script__ = _script;
 		__is_discovered__ = true;
 		test = method(self, _script);
-		return self;
 	}
 
 	/**
