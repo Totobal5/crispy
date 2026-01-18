@@ -1,11 +1,13 @@
 {
-  "resourceType": "GMScript",
-  "resourceVersion": "1.0",
-  "name": "TestCase",
-  "isDnD": false,
-  "isCompatibility": false,
-  "parent": {
-    "name": "Crispy",
-    "path": "folders/Crispy.yy",
+  "$GMScript":"v1",
+  "%Name":"TestCase",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"TestCase",
+  "parent":{
+    "name":"Crispy",
+    "path":"folders/Crispy.yy",
   },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
 }

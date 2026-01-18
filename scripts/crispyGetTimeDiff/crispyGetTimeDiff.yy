@@ -1,12 +1,13 @@
 {
-  "isDnD": false,
-  "isCompatibility": false,
-  "parent": {
-    "name": "Crispy",
-    "path": "folders/Crispy.yy",
+  "$GMScript":"v1",
+  "%Name":"crispyGetTimeDiff",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"crispyGetTimeDiff",
+  "parent":{
+    "name":"Crispy",
+    "path":"folders/Crispy.yy",
   },
-  "resourceVersion": "1.0",
-  "name": "crispyGetTimeDiff",
-  "tags": [],
-  "resourceType": "GMScript",
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
 }

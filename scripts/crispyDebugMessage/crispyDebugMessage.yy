@@ -1,11 +1,13 @@
 {
-  "resourceType": "GMScript",
-  "resourceVersion": "1.0",
-  "name": "crispyDebugMessage",
-  "isDnD": false,
-  "isCompatibility": false,
-  "parent": {
-    "name": "Crispy",
-    "path": "folders/Crispy.yy",
+  "$GMScript":"v1",
+  "%Name":"crispyDebugMessage",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"crispyDebugMessage",
+  "parent":{
+    "name":"Crispy",
+    "path":"folders/Crispy.yy",
   },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
 }

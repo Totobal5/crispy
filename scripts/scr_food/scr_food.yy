@@ -1,11 +1,13 @@
 {
-  "resourceType": "GMScript",
-  "resourceVersion": "1.0",
-  "name": "scr_food",
-  "isDnD": false,
-  "isCompatibility": false,
-  "parent": {
-    "name": "Food",
-    "path": "folders/Scripts/Food.yy",
+  "$GMScript":"v1",
+  "%Name":"scr_food",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"scr_food",
+  "parent":{
+    "name":"Food",
+    "path":"folders/Scripts/Food.yy",
   },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
 }

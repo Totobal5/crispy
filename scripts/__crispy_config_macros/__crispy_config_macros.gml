@@ -3,8 +3,8 @@
 #macro CRISPY_NAME "Crispy"
 #macro CRISPY_AUTHOR "Brent Frymire"
 #macro CRISPY_REPO "https://github.com/bfrymire/crispy"
-#macro CRISPY_VERSION "1.8.5" // major.minor.patch
-#macro CRISPY_DATE "2023-09-04" // yyyy-mm-dd
+#macro CRISPY_VERSION "1.9.0" // major.minor.patch
+#macro CRISPY_DATE "2025-11-26" // yyyy-mm-dd
 
 #macro CRISPY_DEBUG false // Enables outputting extra context on some silent functions
 #macro CRISPY_VERBOSITY 2 // Determines how verbose assertion outputs will be. Acceptable values are 0, 1, or 2

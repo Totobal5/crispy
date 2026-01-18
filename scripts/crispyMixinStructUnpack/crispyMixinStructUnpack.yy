@@ -1,12 +1,13 @@
 {
-  "isDnD": false,
-  "isCompatibility": false,
-  "parent": {
-    "name": "Crispy",
-    "path": "folders/Crispy.yy",
+  "$GMScript":"v1",
+  "%Name":"crispyMixinStructUnpack",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"crispyMixinStructUnpack",
+  "parent":{
+    "name":"Crispy",
+    "path":"folders/Crispy.yy",
   },
-  "resourceVersion": "1.0",
-  "name": "crispyMixinStructUnpack",
-  "tags": [],
-  "resourceType": "GMScript",
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
 }
