@@ -47,7 +47,10 @@ function CrispyRunner(_name, _unpack = undefined) : CrispyTest(_name) constructo
 			case "CrispyCase":
 				_i = 0; repeat (array_length(_input.__logs) )
 				{
-					AddLog(_input.__logs[_i]);
+					var _log = _input.__logs[_i];
+					_log.__duration = _input.__duration;
+					_log.__skipped = _input.__skipped;
+					AddLog(_log);
 					++_i;
 				}
 			break;
@@ -55,12 +58,15 @@ function CrispyRunner(_name, _unpack = undefined) : CrispyTest(_name) constructo
 			case "CrispySuite":
 				var _k = 0; repeat (array_length(_input.__tests) )
 				{
-					_i = 0; repeat (array_length(_input.__tests[_k].__logs) )
+					var _case = _input.__tests[_k];
+					_i = 0; repeat (array_length(_case.__logs) )
 					{
-						AddLog(_input.__tests[_k].__logs[_i]);
+						var _log = _case.__logs[_i];
+						_log.__duration = _case.__duration;
+						_log.__skipped = _case.__skipped;
+						AddLog(_log);
 						++_i;
 					}
-
 					++_k;
 				}
 			break;

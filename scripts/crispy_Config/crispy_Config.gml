@@ -24,3 +24,5 @@
 
 
 show_debug_message("Using " + CRISPY_NAME + " unit testing framework by " + CRISPY_AUTHOR + ". This is version " + CRISPY_VERSION + ", released on " + CRISPY_DATE + ".");
+
+global.__crispy_global = self;

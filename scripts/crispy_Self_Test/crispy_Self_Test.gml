@@ -99,6 +99,66 @@ function test_crispy_case_assert_deep_equal_fails_on_difference() {
 	AssertFalse(_case.__logs[0].__pass, "AssertDeepEqual should fail when nested values differ");
 }
 
+function test_crispy_case_records_duration_after_run() {
+	var _case = new CrispyCase("timed", function() {
+		// trivial body
+	});
+	_case.Run();
+	AssertTrue(_case.GetDuration() >= 0, "Duration should be recorded");
+}
+
+function test_crispy_case_skip_prevents_execution() {
+	var _case = new CrispyCase("skipped", function() {
+		AssertTrue(false, "This should not run");
+	});
+	_case.Skip();
+	_case.Run();
+	AssertEqual(array_length(_case.__logs), 0, "Skipped case should have no logs");
+	AssertTrue(_case.IsSkipped(), "Case should be marked as skipped");
+}
+
+function test_crispy_case_assert_contains_in_array() {
+	var _case = new CrispyCase("contains_array", function() {
+		var _arr = [1, 2, 3, 4, 5];
+		AssertContains(_arr, 3, "Array should contain 3");
+	});
+	_case.Run();
+	AssertTrue(_case.__logs[0].__pass, "AssertContains should pass with value in array");
+}
+
+function test_crispy_case_assert_contains_in_string() {
+	var _case = new CrispyCase("contains_string", function() {
+		AssertContains("hello world", "world", "String should contain 'world'");
+	});
+	_case.Run();
+	AssertTrue(_case.__logs[0].__pass, "AssertContains should pass with substring");
+}
+
+function test_crispy_case_assert_contains_fails() {
+	var _case = new CrispyCase("contains_fail", function() {
+		var _arr = [1, 2, 3];
+		AssertContains(_arr, 99, "Should fail");
+	});
+	_case.Run();
+	AssertFalse(_case.__logs[0].__pass, "AssertContains should fail when value not found");
+}
+
+function test_crispy_case_assert_near_passes() {
+	var _case = new CrispyCase("near_pass", function() {
+		AssertNear(10.05, 10.0, 0.1, "Values should be near");
+	});
+	_case.Run();
+	AssertTrue(_case.__logs[0].__pass, "AssertNear should pass within tolerance");
+}
+
+function test_crispy_case_assert_near_fails() {
+	var _case = new CrispyCase("near_fail", function() {
+		AssertNear(10.5, 10.0, 0.1, "Values should be near");
+	});
+	_case.Run();
+	AssertFalse(_case.__logs[0].__pass, "AssertNear should fail outside tolerance");
+}
+
 function test_crispy_case_assert_true_passes() {
 	var _case = new CrispyCase("test", function() {});
 	_case.AssertTrue(true, "Should be true");

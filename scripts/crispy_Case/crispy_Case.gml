@@ -18,9 +18,15 @@ function CrispyCase(_name, _func, _unpack = undefined) : CrispyTest(_name) const
 	/// @ignore
 	__logs = [];
 	/// @ignore
+	__duration = 0;
+	/// @ignore
 	__is_discovered = false;
 	/// @ignore
 	__discovered_script = undefined;
+	/// @ignore
+	__skipped = false;
+	/// @ignore
+	__only = false;
 
 	/// Run struct unpacker if unpack argument was provided
 	/// Stays after all variables are initialized so they may be overwritten
@@ -40,6 +46,20 @@ function CrispyCase(_name, _func, _unpack = undefined) : CrispyTest(_name) const
 	static GetLogs = function()
 	{
 		return __logs;
+	}
+
+	/// @description Get the duration of the last run in seconds
+	/// @returns {Real} Duration in seconds
+	static GetDuration = function()
+	{
+		return __duration;
+	}
+
+	/// @description Check if this test case is skipped
+	/// @returns {Bool} Whether the test is skipped
+	static IsSkipped = function()
+	{
+		return __skipped;
 	}
 
 	// Methods
@@ -63,7 +83,120 @@ function CrispyCase(_name, _func, _unpack = undefined) : CrispyTest(_name) const
 		return self;
 	}
 
-	/// @description Test that first and second are equal. The first and second will be checked for the same type first, then check if they're equal
+	/// @description Mark this test case as skipped
+	/// @returns {Struct.CrispyCase} Self for chaining
+	static Skip = function()
+	{
+		__skipped = true;
+		return self;
+	}
+
+	/// @description Mark this test case to run only (all others in suite/runner skipped)
+	/// @returns {Struct.CrispyCase} Self for chaining
+	static Only = function()
+	{
+		__only = true;
+		return self;
+	}
+
+	/// @description Test that a value is contained in array or string
+	/// @param {Any} container - Array or string to search in
+	/// @param {Any} value - Value to find
+	/// @param {String} [message] - Custom message to output on failure
+	/// @returns {Struct.CrispyCase} Self for chaining
+	static AssertContains = function(_container, _value, _message)
+	{
+		// Check supplied arguments
+		if (argument_count < 2)
+		{
+			show_error($"{instanceof(self)}.AssertContains() expected 2 arguments, received {argument_count}.", true);
+		}
+
+		if (!__crispy_validate_message_param(instanceof(self), "AssertContains", _message)) return self;
+
+		var _found = false;
+
+		if (is_array(_container))
+		{
+			var _i = 0; repeat (array_length(_container))
+			{
+				if (_container[_i] == _value)
+				{
+					_found = true;
+					break;
+				}
+				++_i;
+			}
+		}
+		else if (is_string(_container))
+		{
+			_found = (string_pos(_value, _container) > 0);
+		}
+		else
+		{
+			__crispy_error($"{instanceof(self)}.AssertContains() \"container\" expected an array or string, received {typeof(_container)}.");
+			return self;
+		}
+
+		if (_found)
+		{
+			AddLog(new CrispyLog(self, {
+				__pass: true,
+			}));
+		}
+		else
+		{
+			AddLog(new CrispyLog(self, {
+				__pass: false,
+				__msg: _message,
+				__helper_text: $"value not found in container: {_value}",
+			}));
+		}
+
+		return self;
+	}
+
+	/// @description Test that two numbers are approximately equal within a tolerance
+	/// @param {Real} actual - Actual value
+	/// @param {Real} expected - Expected value
+	/// @param {Real} tolerance - Maximum allowed difference
+	/// @param {String} [message] - Custom message to output on failure
+	/// @returns {Struct.CrispyCase} Self for chaining
+	static AssertNear = function(_actual, _expected, _tolerance, _message)
+	{
+		// Check supplied arguments
+		if (argument_count < 3)
+		{
+			show_error($"{instanceof(self)}.AssertNear() expected 3 arguments, received {argument_count}.", true);
+		}
+
+		if (!is_real(_actual) || !is_real(_expected) || !is_real(_tolerance))
+		{
+			__crispy_error($"{instanceof(self)}.AssertNear() all arguments must be real numbers.");
+			return self;
+		}
+
+		if (!__crispy_validate_message_param(instanceof(self), "AssertNear", _message)) return self;
+
+		var _diff = abs(_actual - _expected);
+
+		if (_diff <= _tolerance)
+		{
+			AddLog(new CrispyLog(self, {
+				__pass: true,
+			}));
+		}
+		else
+		{
+			AddLog(new CrispyLog(self, {
+				__pass: false,
+				__msg: _message,
+				__helper_text: $"values differ by {_diff}, tolerance is {_tolerance}: {_actual} vs {_expected}",
+			}));
+		}
+
+		return self;
+	}
 	/// @param {Any} first - First value
 	/// @param {Any} second - Second value to check against first
 	/// @param {String} [message] - Custom message to output on failure
@@ -580,6 +713,10 @@ function CrispyCase(_name, _func, _unpack = undefined) : CrispyTest(_name) const
 	/// @description Set of functions to run in order for the test
 	static Run = function()
 	{
+		if (__skipped) return self;
+		
+		var _start_time = get_timer();
+		
 		SetUp();
 		OnRunBegin();
 		
@@ -587,6 +724,10 @@ function CrispyCase(_name, _func, _unpack = undefined) : CrispyTest(_name) const
 
 		OnRunEnd();
 		TearDown();
+		
+		__duration = (get_timer() - _start_time) / 1000000;
+		
+		return self;
 	}
 
 	/// @description Sets up a discovered script to use as the test

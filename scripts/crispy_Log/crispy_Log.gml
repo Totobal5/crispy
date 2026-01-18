@@ -16,9 +16,13 @@ function CrispyLog(_test_case, _unpack = undefined) constructor
 	/// @ignore
 	__helper_text = undefined;
 	/// @ignore
+	__skipped = false;
+	/// @ignore
 	__class = _test_case.__class;
 	/// @ignore
 	__name = _test_case.__name;
+	/// @ignore
+	__duration = 0;
 	/// @ignore
 	__display_name = undefined;
 
@@ -52,14 +56,42 @@ function CrispyLog(_test_case, _unpack = undefined) constructor
 		switch (__verbosity)
 		{
 			case 0:
-				_msg += __pass ? CRISPY_PASS_MSG_SILENT : CRISPY_FAIL_MSG_SILENT;
+				if (__skipped)
+				{
+					_msg += "S"; // Skipped
+				}
+				else
+				{
+					_msg += __pass ? CRISPY_PASS_MSG_SILENT : CRISPY_FAIL_MSG_SILENT;
+				}
 			break;
 
 			case 1: // Think of something better for this later
 			case 2:
-				if (__pass)
+				if (__skipped)
+				{
+					_msg += "...skipped";
+				}
+				else if (__pass)
 				{
 					_msg += "..." + CRISPY_PASS_MSG_VERBOSE;
+					if (__duration >= 0)
+					{
+						var _duration_str = "";
+						if (__duration < 0.001)
+						{
+							_duration_str = string_format(__duration * 1000000, 0, 2) + "us";
+						}
+						else if (__duration < 1)
+						{
+							_duration_str = string_format(__duration * 1000, 0, 2) + "ms";
+						}
+						else
+						{
+							_duration_str = string_format(__duration, 0, 2) + "s";
+						}
+						_msg += " (" + _duration_str + ")";
+					}
 				}
 				else
 				{
