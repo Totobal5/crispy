@@ -1,11 +1,13 @@
 {
-  "resourceType": "GMScript",
-  "resourceVersion": "1.0",
-  "name": "GuiBox",
-  "isDnD": false,
-  "isCompatibility": false,
-  "parent": {
-    "name": "GUI",
-    "path": "folders/Scripts/GUI.yy",
+  "$GMScript":"v1",
+  "%Name":"GuiBox",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"GuiBox",
+  "parent":{
+    "name":"GUI",
+    "path":"folders/Scripts/GUI.yy",
   },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
 }

@@ -1,11 +1,13 @@
 {
-  "resourceType": "GMScript",
-  "resourceVersion": "1.0",
-  "name": "example_of_discoverable_tests",
-  "isDnD": false,
-  "isCompatibility": false,
-  "parent": {
-    "name": "Unit Tests",
-    "path": "folders/Unit Tests.yy",
+  "$GMScript":"v1",
+  "%Name":"example_of_discoverable_tests",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"example_of_discoverable_tests",
+  "parent":{
+    "name":"Unit Tests",
+    "path":"folders/Unit Tests.yy",
   },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
 }
