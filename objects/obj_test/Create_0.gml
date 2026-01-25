@@ -9,7 +9,9 @@ results_max = 255;
 runner.__Output = method(self, function(_message) {
 	show_debug_message(_message);
 	ds_list_insert(results, 0, _message);
-	while (ds_list_size(results) > results_max) {
+	
+    while (ds_list_size(results) > results_max) 
+    {
 		ds_list_delete(results, results_max - 1);
 	}
 });

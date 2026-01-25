@@ -1,6 +1,7 @@
 /// @description Testing suite that holds tests
 /// @param {String} name - Name of suite
 /// @param {Struct} [unpack=undefined] - Struct for crispy_struct_unpack
+/// @return {Struct.CrispySuite} description
 function CrispySuite(_name, _unpack = undefined) : CrispyTest(_name) constructor 
 {
 	/// @ignore
