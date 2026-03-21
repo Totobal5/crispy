@@ -10,6 +10,7 @@ function CrispyTest(_name) constructor
 
 	/// @ignore
 	__name = undefined;
+
 	static SetUp = undefined;
 	static TearDown = undefined;
 
@@ -22,20 +23,12 @@ function CrispyTest(_name) constructor
 	/// @ignore
 	static __OnRunEnd = undefined;
 
+	/// @ignore
 	__struct_unpack = method(self, __crispy_struct_unpack);
-
 	__SetName(_name);
 
-	// Getters
 
-	/// @description Get the name of this test
-	/// @returns {String} Name of the test
-	static GetName = function()
-	{
-		return __name;
-	}
-
-	// Methods
+	#region METHODS
 
 	/// @ignore
 	/// @description Set name of class object
@@ -49,6 +42,13 @@ function CrispyTest(_name) constructor
 		__name = _name;
 	}
 
+	/// @description Get the name of this test
+	/// @returns {String} Name of the test
+	static GetName = function()
+	{
+		return __name;
+	}
+	
 	/// @description Event to be called at the beginning of run
 	/// @param {Function} [func] - Method to override __OnRunBegin with
 	static OnRunBegin = function(_func)
@@ -96,4 +96,6 @@ function CrispyTest(_name) constructor
 			}
 		}
 	}
+
+	#endregion
 }

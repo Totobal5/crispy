@@ -37,7 +37,7 @@ function CrispyRunner(_name, _unpack = undefined) : CrispyTest(_name) constructo
 	/// @param {Struct} input - Adds logs of the input to logs
 	static CaptureLogs = function(_input)
 	{
-		var _i, _logs_len;
+		var _i;
 		switch (instanceof(_input))
 		{
 			case "CrispyLog":
@@ -45,28 +45,46 @@ function CrispyRunner(_name, _unpack = undefined) : CrispyTest(_name) constructo
 			break;
 
 			case "CrispyCase":
-				_i = 0; repeat (array_length(_input.__logs) )
+				var _case_logs_len = array_length(_input.__logs);
+				var _case_pass = true;
+				var _case_msg = undefined;
+				var _case_helper_text = undefined;
+
+				_i = 0; repeat (_case_logs_len)
 				{
 					var _log = _input.__logs[_i];
-					_log.__duration = _input.__duration;
-					_log.__skipped = _input.__skipped;
-					AddLog(_log);
+					if (!_log.__pass)
+					{
+						_case_pass = false;
+
+						if (is_undefined(_case_msg) && !is_undefined(_log.__msg) && _log.__msg != "")
+						{
+							_case_msg = _log.__msg;
+						}
+
+						if (is_undefined(_case_helper_text) && !is_undefined(_log.__helper_text) && _log.__helper_text != "")
+						{
+							_case_helper_text = _log.__helper_text;
+						}
+					}
+
 					++_i;
 				}
+
+				AddLog(new CrispyLog(_input, {
+					__pass: _case_pass,
+					__msg: _case_msg,
+					__helper_text: _case_helper_text,
+					__duration: _input.__duration,
+					__skipped: _input.__skipped,
+				}) );
 			break;
 			
 			case "CrispySuite":
 				var _k = 0; repeat (array_length(_input.__tests) )
 				{
 					var _case = _input.__tests[_k];
-					_i = 0; repeat (array_length(_case.__logs) )
-					{
-						var _log = _case.__logs[_i];
-						_log.__duration = _case.__duration;
-						_log.__skipped = _case.__skipped;
-						AddLog(_log);
-						++_i;
-					}
+					CaptureLogs(_case);
 					++_k;
 				}
 			break;

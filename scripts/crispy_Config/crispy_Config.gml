@@ -1,26 +1,44 @@
-// Feather disable all
+/// @ignore
+#macro CRISPY_NAME      "Crispy"
+/// @ignore
+#macro CRISPY_AUTHOR    "Brent Frymire"
+/// @ignore
+#macro CRISPY_REPO      "https://github.com/bfrymire/crispy"
+/// @ignore [MAJOR.MINOR.PATH]
+#macro CRISPY_VERSION   "2.0.1"
+/// @ignore yyyy-mm-dd
+#macro CRISPY_DATE      "2025-11-26" 
 
-#macro CRISPY_NAME "Crispy"
-#macro CRISPY_AUTHOR "Brent Frymire"
-#macro CRISPY_REPO "https://github.com/bfrymire/crispy"
-#macro CRISPY_VERSION "2.0.0" // major.minor.patch
-#macro CRISPY_DATE "2025-11-26" // yyyy-mm-dd
+/// @ignore Boolean flag that can be used to automatically run tests
+#macro CRISPY_RUN           true
+/// @ignore Enables outputting extra context on some silent functions
+#macro CRISPY_DEBUG         false
+/// @ignore Determines how verbose assertion outputs will be. Acceptable values are 0, 1, or 2
+#macro CRISPY_VERBOSITY     2
+/// @ignore Enables strict mode. This will make the game close immediately with an error if the framework encounters an unexpected value or type, which can be useful for debugging
+#macro CRISPY_STRICT_MODE   false
 
-#macro CRISPY_RUN true // Boolean flag that can be used to automatically run tests
-#macro CRISPY_DEBUG false // Enables outputting extra context on some silent functions
-#macro CRISPY_VERBOSITY 2 // Determines how verbose assertion outputs will be. Acceptable values are 0, 1, or 2
+/// @ignore Number of decimal places to round to when outputting time values
+#macro CRISPY_TIME_PRECISION 6 
 
-#macro CRISPY_TIME_PRECISION 6 // Number of decimal places timers will output to
+/// @ignore Output string when an assertion passes silently
+#macro CRISPY_PASS_MSG_SILENT   "."
+/// @ignore Output string when an assertion fails silently
+#macro CRISPY_FAIL_MSG_SILENT   "F"
 
-#macro CRISPY_PASS_MSG_SILENT "." // Output string when an assertion passes silently
-#macro CRISPY_FAIL_MSG_SILENT "F" // Output string when an assertion fails silently
-#macro CRISPY_PASS_MSG_VERBOSE "ok" // Output string when an assertion passes verbosely
-#macro CRISPY_FAIL_MSG_VERBOSE "Fail" // Output string when an assertion fails verbosely
-#macro CRISPY_STATUS_OUTPUT_LENGTH 150 // Number of characters per line when outputting CrispyCase statuses
+/// @ignore Output string when an assertion passes verbosely
+#macro CRISPY_PASS_MSG_VERBOSE  "Ok"
+/// @ignore Output string when an assertion fails verbosely
+#macro CRISPY_FAIL_MSG_VERBOSE  "Fail"
 
-#macro CRISPY_SILENCE_PASSING_TESTS_OUTPUT false // Enables silencing passing test messages
+/// @ignore Number of characters per line when outputting CrispyCase statuses
+#macro CRISPY_STATUS_OUTPUT_LENGTH 150
 
-#macro CRISPY_STRUCT_UNPACK_ALLOW_DUNDER false // Enables dunder variables to be overwritten when using crispyStructUnpack
+/// @ignore Enables silencing passing test messages
+#macro CRISPY_SILENCE_PASSING_TESTS_OUTPUT false
+
+/// @ignore Enables dunder variables to be overwritten when using `__crispy_struct_unpack`
+#macro CRISPY_STRUCT_UNPACK_ALLOW_DUNDER false
 
 
 show_debug_message("Using " + CRISPY_NAME + " unit testing framework by " + CRISPY_AUTHOR + ". This is version " + CRISPY_VERSION + ", released on " + CRISPY_DATE + ".");

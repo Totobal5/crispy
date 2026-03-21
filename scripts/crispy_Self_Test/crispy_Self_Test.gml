@@ -1,11 +1,9 @@
-// Feather disable all
-
 /// Meta-tests for Crispy testing framework
 /// These tests verify that Crispy itself works correctly
 
 // ==================== CrispyLog Tests ====================
-
-function test_crispy_log_creates_passing_log() {
+function test_crispy_log_creates_passing_log() 
+{
 	var _case = new CrispyCase("test", function() {});
 	var _log = new CrispyLog(_case, {
 		__pass: true,
@@ -18,7 +16,8 @@ function test_crispy_log_creates_passing_log() {
 	AssertEqual(_log.__helper_text, "Helper", "Helper text should match");
 }
 
-function test_crispy_log_creates_failing_log() {
+function test_crispy_log_creates_failing_log() 
+{
 	var _case = new CrispyCase("test", function() {});
 	var _log = new CrispyLog(_case, {
 		__pass: false,
@@ -30,7 +29,8 @@ function test_crispy_log_creates_failing_log() {
 	AssertEqual(_log.__msg, "Test failed", "Log message should match");
 }
 
-function test_crispy_log_get_msg_with_helper_text() {
+function test_crispy_log_get_msg_with_helper_text()
+{
 	var _case = new CrispyCase("test", function() {});
 	var _log = new CrispyLog(_case, {
 		__pass: true,
@@ -45,7 +45,8 @@ function test_crispy_log_get_msg_with_helper_text() {
 
 // ==================== CrispyCase Tests ====================
 
-function test_crispy_case_assert_equal_passes_with_same_values() {
+function test_crispy_case_assert_equal_passes_with_same_values()
+{
 	var _case = new CrispyCase("test", function() {});
 	_case.AssertEqual(5, 5, "Values should be equal");
 	
@@ -53,7 +54,8 @@ function test_crispy_case_assert_equal_passes_with_same_values() {
 	AssertTrue(_case.__logs[0].__pass, "Assertion should pass");
 }
 
-function test_crispy_case_assert_equal_fails_with_different_values() {
+function test_crispy_case_assert_equal_fails_with_different_values() 
+{
 	var _case = new CrispyCase("test", function() {});
 	_case.AssertEqual(5, 10, "Values should be different");
 	
@@ -61,7 +63,8 @@ function test_crispy_case_assert_equal_fails_with_different_values() {
 	AssertFalse(_case.__logs[0].__pass, "Assertion should fail");
 }
 
-function test_crispy_case_assert_deep_equal_passes_with_structs_and_arrays() {
+function test_crispy_case_assert_deep_equal_passes_with_structs_and_arrays()
+{
 	var _case = new CrispyCase("test", function() {});
 
 	var _expected = {
@@ -81,7 +84,8 @@ function test_crispy_case_assert_deep_equal_passes_with_structs_and_arrays() {
 	AssertTrue(_case.__logs[0].__pass, "AssertDeepEqual should pass for matching nested data");
 }
 
-function test_crispy_case_assert_deep_equal_fails_on_difference() {
+function test_crispy_case_assert_deep_equal_fails_on_difference()
+{
 	var _case = new CrispyCase("test", function() {});
 
 	var _expected = {
@@ -99,7 +103,8 @@ function test_crispy_case_assert_deep_equal_fails_on_difference() {
 	AssertFalse(_case.__logs[0].__pass, "AssertDeepEqual should fail when nested values differ");
 }
 
-function test_crispy_case_records_duration_after_run() {
+function test_crispy_case_records_duration_after_run()
+{
 	var _case = new CrispyCase("timed", function() {
 		// trivial body
 	});
@@ -107,7 +112,8 @@ function test_crispy_case_records_duration_after_run() {
 	AssertTrue(_case.GetDuration() >= 0, "Duration should be recorded");
 }
 
-function test_crispy_case_skip_prevents_execution() {
+function test_crispy_case_skip_prevents_execution() 
+{
 	var _case = new CrispyCase("skipped", function() {
 		AssertTrue(false, "This should not run");
 	});
@@ -117,7 +123,8 @@ function test_crispy_case_skip_prevents_execution() {
 	AssertTrue(_case.IsSkipped(), "Case should be marked as skipped");
 }
 
-function test_crispy_case_assert_contains_in_array() {
+function test_crispy_case_assert_contains_in_array() 
+{
 	var _case = new CrispyCase("contains_array", function() {
 		var _arr = [1, 2, 3, 4, 5];
 		AssertContains(_arr, 3, "Array should contain 3");
@@ -126,7 +133,8 @@ function test_crispy_case_assert_contains_in_array() {
 	AssertTrue(_case.__logs[0].__pass, "AssertContains should pass with value in array");
 }
 
-function test_crispy_case_assert_contains_in_string() {
+function test_crispy_case_assert_contains_in_string() 
+{
 	var _case = new CrispyCase("contains_string", function() {
 		AssertContains("hello world", "world", "String should contain 'world'");
 	});
@@ -134,7 +142,8 @@ function test_crispy_case_assert_contains_in_string() {
 	AssertTrue(_case.__logs[0].__pass, "AssertContains should pass with substring");
 }
 
-function test_crispy_case_assert_contains_fails() {
+function test_crispy_case_assert_contains_fails() 
+{
 	var _case = new CrispyCase("contains_fail", function() {
 		var _arr = [1, 2, 3];
 		AssertContains(_arr, 99, "Should fail");
@@ -143,7 +152,8 @@ function test_crispy_case_assert_contains_fails() {
 	AssertFalse(_case.__logs[0].__pass, "AssertContains should fail when value not found");
 }
 
-function test_crispy_case_assert_near_passes() {
+function test_crispy_case_assert_near_passes()
+{
 	var _case = new CrispyCase("near_pass", function() {
 		AssertNear(10.05, 10.0, 0.1, "Values should be near");
 	});
@@ -151,7 +161,8 @@ function test_crispy_case_assert_near_passes() {
 	AssertTrue(_case.__logs[0].__pass, "AssertNear should pass within tolerance");
 }
 
-function test_crispy_case_assert_near_fails() {
+function test_crispy_case_assert_near_fails()
+{
 	var _case = new CrispyCase("near_fail", function() {
 		AssertNear(10.5, 10.0, 0.1, "Values should be near");
 	});
@@ -159,35 +170,40 @@ function test_crispy_case_assert_near_fails() {
 	AssertFalse(_case.__logs[0].__pass, "AssertNear should fail outside tolerance");
 }
 
-function test_crispy_case_assert_true_passes() {
+function test_crispy_case_assert_true_passes()
+{
 	var _case = new CrispyCase("test", function() {});
 	_case.AssertTrue(true, "Should be true");
 	
 	AssertTrue(_case.__logs[0].__pass, "AssertTrue should pass with true value");
 }
 
-function test_crispy_case_assert_false_passes() {
+function test_crispy_case_assert_false_passes()
+{
 	var _case = new CrispyCase("test", function() {});
 	_case.AssertFalse(false, "Should be false");
 	
 	AssertTrue(_case.__logs[0].__pass, "AssertFalse should pass with false value");
 }
 
-function test_crispy_case_assert_is_noone_passes() {
+function test_crispy_case_assert_is_noone_passes() 
+{
 	var _case = new CrispyCase("test", function() {});
 	_case.AssertIsNoone(noone, "Should be noone");
 	
 	AssertTrue(_case.__logs[0].__pass, "AssertIsNoone should pass with noone value");
 }
 
-function test_crispy_case_assert_is_undefined_passes() {
+function test_crispy_case_assert_is_undefined_passes() 
+{
 	var _case = new CrispyCase("test", function() {});
 	_case.AssertIsUndefined(undefined, "Should be undefined");
 	
 	AssertTrue(_case.__logs[0].__pass, "AssertIsUndefined should pass with undefined value");
 }
 
-function test_crispy_case_assert_raises_passes_when_error_thrown() {
+function test_crispy_case_assert_raises_passes_when_error_thrown()
+{
 	var _case = new CrispyCase("test", function() {});
 	_case.AssertRaises(function() {
 		throw "Expected error";
@@ -196,7 +212,8 @@ function test_crispy_case_assert_raises_passes_when_error_thrown() {
 	AssertTrue(_case.__logs[0].__pass, "AssertRaises should pass when function throws");
 }
 
-function test_crispy_case_assert_does_not_throw_passes() {
+function test_crispy_case_assert_does_not_throw_passes() 
+{
 	var _case = new CrispyCase("test", function() {});
 	_case.AssertDoesNotThrow(function() {
 		var _x = 5 + 5;
@@ -207,14 +224,16 @@ function test_crispy_case_assert_does_not_throw_passes() {
 
 // ==================== CrispySuite Tests ====================
 
-function test_crispy_suite_creates_with_name() {
+function test_crispy_suite_creates_with_name()
+{
 	var _suite = new CrispySuite("test_suite");
 	
 	AssertEqual(_suite.__name, "test_suite", "Suite name should match");
 	AssertEqual(array_length(_suite.__tests), 0, "Suite should start with no tests");
 }
 
-function test_crispy_suite_adds_test_case() {
+function test_crispy_suite_adds_test_case()
+{
 	var _suite = new CrispySuite("test_suite");
 	var _case = new CrispyCase("test_case", function() {});
 	
@@ -223,7 +242,8 @@ function test_crispy_suite_adds_test_case() {
 	AssertEqual(array_length(_suite.__tests), 1, "Suite should have one test");
 }
 
-function test_crispy_suite_setup_runs_before_tests() {
+function test_crispy_suite_setup_runs_before_tests()
+{
 	CrispyTest.vars.setup_ran = false;
 	
 	var _suite = new CrispySuite("test_suite");
@@ -241,7 +261,8 @@ function test_crispy_suite_setup_runs_before_tests() {
 	AssertTrue(CrispyTest.vars.setup_ran, "SetUp should have executed");
 }
 
-function test_crispy_suite_teardown_runs_after_tests() {
+function test_crispy_suite_teardown_runs_after_tests()
+{
 	CrispyTest.vars.teardown_ran = false;
 	
 	var _suite = new CrispySuite("test_suite");
@@ -259,14 +280,16 @@ function test_crispy_suite_teardown_runs_after_tests() {
 
 // ==================== CrispyRunner Tests ====================
 
-function test_crispy_runner_creates_with_name() {
+function test_crispy_runner_creates_with_name() 
+{
 	var _runner = new CrispyRunner("test_runner");
 	
 	AssertEqual(_runner.__name, "test_runner", "Runner name should match");
 	AssertEqual(array_length(_runner.__suites), 0, "Runner should start with no suites");
 }
 
-function test_crispy_runner_adds_test_suite() {
+function test_crispy_runner_adds_test_suite() 
+{
 	var _runner = new CrispyRunner("test_runner");
 	var _suite = new CrispySuite("test_suite");
 	
@@ -275,7 +298,8 @@ function test_crispy_runner_adds_test_suite() {
 	AssertEqual(array_length(_runner.__suites), 1, "Runner should have one suite");
 }
 
-function test_crispy_runner_captures_logs_from_suite() {
+function test_crispy_runner_captures_logs_from_suite()
+{
 	var _runner = new CrispyRunner("test_runner");
 	var _suite = new CrispySuite("test_suite");
 	var _case = new CrispyCase("test", function() {
@@ -290,7 +314,8 @@ function test_crispy_runner_captures_logs_from_suite() {
 	AssertTrue(_runner.__logs[0].__pass, "Captured log should be passing");
 }
 
-function test_crispy_runner_hr_creates_horizontal_line() {
+function test_crispy_runner_hr_creates_horizontal_line()
+{
 	var _runner = new CrispyRunner("test_runner");
 	var _hr = _runner.Hr("-", 10);
 	
@@ -299,7 +324,8 @@ function test_crispy_runner_hr_creates_horizontal_line() {
 
 // ==================== Discovery Tests ====================
 
-function test_crispy_runner_discover_finds_functions() {
+function test_crispy_runner_discover_finds_functions()
+{
 	var _runner = new CrispyRunner("test_runner");
 	var _suite = new CrispySuite("discovery_suite");
 	
@@ -311,13 +337,15 @@ function test_crispy_runner_discover_finds_functions() {
 
 // ==================== Shared State Tests ====================
 
-function test_crispy_shared_vars_accessible() {
+function test_crispy_shared_vars_accessible()
+{
 	CrispyTest.vars.test_value = 42;
 	
 	AssertEqual(CrispyTest.vars.test_value, 42, "Shared vars should be accessible");
 }
 
-function test_crispy_shared_vars_persists_across_tests() {
+function test_crispy_shared_vars_persists_across_tests() 
+{
 	CrispyTest.vars.counter = 0;
 	CrispyTest.vars.counter += 1;
 	
@@ -326,28 +354,32 @@ function test_crispy_shared_vars_persists_across_tests() {
 
 // ==================== Type Validation Tests ====================
 
-function test_crispy_case_assert_equal_fails_different_types() {
+function test_crispy_case_assert_equal_fails_different_types() 
+{
 	var _case = new CrispyCase("test", function() {});
 	_case.AssertEqual(5, "5", "Should fail with different types");
 	
 	AssertFalse(_case.__logs[0].__pass, "AssertEqual should fail with different types");
 }
 
-function test_crispy_case_assert_not_equal_passes_different_values() {
+function test_crispy_case_assert_not_equal_passes_different_values() 
+{
 	var _case = new CrispyCase("test", function() {});
 	_case.AssertNotEqual(5, 10, "Values are different");
 	
 	AssertTrue(_case.__logs[0].__pass, "AssertNotEqual should pass with different values");
 }
 
-function test_crispy_case_assert_is_not_noone_passes() {
+function test_crispy_case_assert_is_not_noone_passes() 
+{
 	var _case = new CrispyCase("test", function() {});
 	_case.AssertIsNotNoone(5, "Should not be noone");
 	
 	AssertTrue(_case.__logs[0].__pass, "AssertIsNotNoone should pass with non-noone value");
 }
 
-function test_crispy_case_assert_is_not_undefined_passes() {
+function test_crispy_case_assert_is_not_undefined_passes() 
+{
 	var _case = new CrispyCase("test", function() {});
 	_case.AssertIsNotUndefined(5, "Should not be undefined");
 	

@@ -5,21 +5,28 @@ function crispy_vars()
 	return CrispyTest.vars;
 }
 
-/// Helper function for Crispy to display debug messages
+/// @ignore
+/// @description Helper function for Crispy to display debug messages
 /// @param {Any} msg - Text to be displayed in the Output Window
 function __crispy_alert(_msg)
 {
 	if (CRISPY_DEBUG) show_debug_message(CRISPY_NAME + $"ALERT: {_msg}");
 }
 
-/// Helper function for Crispy to display error messages
+/// @ignore
+/// @description Helper function for Crispy to display error messages. If CRISPY_STRICT_MODE is enabled, the game will also close immediately with an error.
 /// @param {Any} msg - Text to be displayed in the Output Window
 function __crispy_error(_msg)
 {
 	if (CRISPY_DEBUG) show_debug_message(CRISPY_NAME + $"ERROR: {_msg}");
+	if (CRISPY_STRICT_MODE)
+	{
+		show_error(CRISPY_NAME + $"FATAL ERROR: {_msg}", true);
+	}
 }
 
-/// Helper function for structs that replaces variable values with given source struct values
+/// @ignore
+/// @description Helper function for structs that replaces variable values with given source struct values
 /// @param {Struct} unpack - Struct used to replace existing values with
 /// @param {Bool} [name_must_exist=true] - Boolean flag that prevents new variable names from being added to destination struct if variable name does not already exist
 /// @ignore
@@ -62,7 +69,8 @@ function __crispy_struct_unpack(_unpack, _name_must_exist = true)
 	}
 }
 
-/// Helper function that returns whether or not a given variable name follows internal variable naming convention
+/// @ignore
+/// @description Helper function that returns whether or not a given variable name follows internal variable naming convention
 /// @param {String} name - Name of variable to check
 /// @returns {Bool} Whether the given string follows internal variable naming convention
 function __crispy_is_internal_variable(_name)
@@ -81,7 +89,8 @@ function __crispy_is_internal_variable(_name)
 	return false;
 }
 
-/// Helper function to validate unpack parameter (DRY validation)
+/// @ignore
+/// @description Helper function to validate unpack parameter (DRY validation)
 /// @param {String} context - Context for error message (e.g., "CrispyCase")
 /// @param {String} method - Method name for error message
 /// @param {Any} unpack - Unpack value to validate
@@ -101,7 +110,8 @@ function __crispy_validate_unpack_param(_context, _method, _unpack)
 	}
 }
 
-/// Helper function to validate struct parameter type (DRY validation)
+/// @ignore
+/// @description Helper function to validate struct parameter type (DRY validation)
 /// @param {String} context - Context for error message
 /// @param {String} method - Method name for error message
 /// @param {String} param_name - Parameter name for error message
@@ -118,7 +128,8 @@ function __crispy_validate_struct_param(_context, _method, _param_name, _param_v
 	return true;
 }
 
-/// Helper function to validate message parameter (DRY validation)
+/// @ignore
+/// @description Helper function to validate message parameter (DRY validation)
 /// @param {String} context - Context for error message
 /// @param {String} method - Method name for error message
 /// @param {Any} message - Message value to validate
@@ -134,7 +145,8 @@ function __crispy_validate_message_param(_context, _method, _message)
 	return true;
 }
 
-/// Helper function to get type display string (DRY type checking)
+/// @ignore
+/// @description Helper function to get type display string (DRY type checking)
 /// @param {Any} value - Value to get type display for
 /// @returns {String} Constructor name if struct, otherwise typeof
 /// @ignore
@@ -148,7 +160,8 @@ function __crispy_get_type_display(_value)
 	return _type;
 }
 
-/// Helper function to validate and set method parameter (DRY validation)
+/// @ignore
+/// @description Helper function to validate and set method parameter (DRY validation)
 /// @param {String} context - Context for error message
 /// @param {String} method_name - Method name being set
 /// @param {Any} func - Function value to validate
@@ -167,7 +180,8 @@ function __crispy_validate_and_bind_method(_context, _method_name, _func)
 	}
 }
 
-/// Helper function to validate specific type parameter (DRY validation)
+/// @ignore
+/// @description Helper function to validate specific type parameter (DRY validation)
 /// @param {String} context - Context for error message
 /// @param {String} method - Method name for error message
 /// @param {String} param_name - Parameter name for error message
