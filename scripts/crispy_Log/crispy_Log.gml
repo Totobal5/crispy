@@ -41,9 +41,27 @@ function CrispyLog(_test_case, _unpack = undefined) constructor
 	/// @ignore
 	__display_name = _display_name;
 
-	/// Run struct unpacker if unpack argument was provided
-	/// Stays after all variables are initialized so they may be overwritten
-	__crispy_validate_unpack_param(instanceof(self), "", _unpack);
+	/// Apply supported internal overrides explicitly so CrispyLog can receive
+	/// framework-owned fields without enabling global dunder unpacking.
+	if (!is_undefined(_unpack))
+	{
+		if (!is_struct(_unpack))
+		{
+			__crispy_error($"{instanceof(self)} \"unpack\" expected a struct or undefined, received {typeof(_unpack)}.");
+		}
+		else
+		{
+			if (struct_exists(_unpack, "__verbosity")) __verbosity = struct_get(_unpack, "__verbosity");
+			if (struct_exists(_unpack, "__pass")) __pass = struct_get(_unpack, "__pass");
+			if (struct_exists(_unpack, "__msg")) __msg = struct_get(_unpack, "__msg");
+			if (struct_exists(_unpack, "__helper_text")) __helper_text = struct_get(_unpack, "__helper_text");
+			if (struct_exists(_unpack, "__skipped")) __skipped = struct_get(_unpack, "__skipped");
+			if (struct_exists(_unpack, "__class")) __class = struct_get(_unpack, "__class");
+			if (struct_exists(_unpack, "__name")) __name = struct_get(_unpack, "__name");
+			if (struct_exists(_unpack, "__duration")) __duration = struct_get(_unpack, "__duration");
+			if (struct_exists(_unpack, "__display_name")) __display_name = struct_get(_unpack, "__display_name");
+		}
+	}
 
 	#region METHODS
 

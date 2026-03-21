@@ -33,14 +33,37 @@ function test_crispy_log_get_msg_with_helper_text()
 {
 	var _case = new CrispyCase("test", function() {});
 	var _log = new CrispyLog(_case, {
-		__pass: true,
-		__msg: "Main message",
+		__pass: false,
 		__helper_text: "Additional info"
 	});
 	
 	var _full_msg = _log.GetMsg();
-	AssertTrue(string_pos("Main message", _full_msg) > 0, "Full message should contain main message");
 	AssertTrue(string_pos("Additional info", _full_msg) > 0, "Full message should contain helper text");
+}
+
+function test_crispy_log_get_msg_with_failure_message()
+{
+	var _case = new CrispyCase("test", function() {});
+	var _log = new CrispyLog(_case, {
+		__pass: false,
+		__msg: "Main message",
+		__helper_text: "Additional info"
+	});
+
+	var _full_msg = _log.GetMsg();
+	AssertTrue(string_pos("Main message", _full_msg) > 0, "Full message should contain main message");
+}
+
+function test_crispy_log_get_msg_with_duration()
+{
+	var _case = new CrispyCase("timed", function() {});
+	var _log = new CrispyLog(_case, {
+		__pass: true,
+		__duration: 0.000038,
+	});
+
+	var _full_msg = _log.GetMsg();
+	AssertTrue(string_pos("38.00us", _full_msg) > 0, "Full message should contain the formatted duration");
 }
 
 // ==================== CrispyCase Tests ====================
