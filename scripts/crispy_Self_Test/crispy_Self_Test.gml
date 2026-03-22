@@ -245,6 +245,45 @@ function test_crispy_case_assert_does_not_throw_passes()
 	AssertTrue(_case.__logs[0].__pass, "AssertDoesNotThrow should pass when no error");
 }
 
+// ==================== CrispyCaseAsync Tests ====================
+
+function test_crispy_case_async_step_checkpoint_completes()
+{
+	var _case = new CrispyCaseAsync("async_step_case");
+	_case.async_calls = 0;
+
+	_case
+		.WaitStep(function() {
+			++async_calls;
+			AssertEqual(async_calls, 1, "Step checkpoint should run exactly once");
+			return true;
+		})
+		.Timeout(10, "frames");
+
+	_case.Start();
+	_case.OnBeginStep();
+	_case.OnStep();
+
+	AssertTrue(_case.IsComplete(), "Async case should complete after step checkpoint");
+	AssertFalse(_case.IsRunning(), "Async case should no longer be running");
+	AssertEqual(_case.async_calls, 1, "Step checkpoint count should be 1");
+}
+
+function test_crispy_case_async_timeout_fails_case()
+{
+	var _case = new CrispyCaseAsync("async_timeout_case")
+		.WaitEndStep(function() {
+			return false;
+		})
+		.Timeout(1, "frames");
+
+	_case.Start();
+	_case.OnBeginStep();
+
+	AssertTrue(_case.IsComplete(), "Async case should complete after timeout");
+	AssertFalse(_case.__logs[0].__pass, "Timeout should produce a failing log");
+}
+
 // ==================== CrispySuite Tests ====================
 
 function test_crispy_suite_creates_with_name()
@@ -356,6 +395,18 @@ function test_crispy_runner_discover_finds_functions()
 	_runner.Discover(_suite, "test_crispy_log_");
 	
 	AssertTrue(array_length(_suite.__tests) > 0, "Discover should find test functions");
+}
+
+function test_crispy_runner_discover_creates_async_case_for_async_function_name()
+{
+	var _runner = new CrispyRunner("test_runner");
+	var _suite = new CrispySuite("discovery_async_suite");
+
+	_runner.AddTestSuite(_suite);
+	_runner.Discover(_suite, "test_discoverable_async_");
+
+	AssertTrue(array_length(_suite.__tests) > 0, "Discover should find async discoverable functions");
+	AssertEqual(instanceof(_suite.__tests[0]), "CrispyCaseAsync", "Discover should create CrispyCaseAsync for async script names");
 }
 
 // ==================== Shared State Tests ====================

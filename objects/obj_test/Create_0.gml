@@ -8,7 +8,22 @@ results_max = 255;
 // Override Output to save results to ds_list
 runner.__Output = method(self, function(_message) {
 	show_debug_message(_message);
-	ds_list_insert(results, 0, _message);
+
+	var _lines = string_split(_message, "\n");
+	var _len = array_length(_lines);
+
+	if (_len == 0)
+	{
+		ds_list_insert(results, 0, _message);
+	}
+	else
+	{
+		// Insert one visual row per line so draw and scroll logic stay accurate.
+		for (var _i = 0; _i < _len; ++_i)
+		{
+			ds_list_insert(results, 0, _lines[_i]);
+		}
+	}
 	
     while (ds_list_size(results) > results_max) 
     {

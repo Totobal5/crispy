@@ -8,6 +8,11 @@ if (CRISPY_RUN)
 	} 
 	else 
 	{
+		if (is_method(runner.IsRunning) && runner.IsRunning())
+		{
+			runner.Update();
+		}
+
 		// Re-run tests
 		if (keyboard_check_pressed(ord("R")) ) 
 		{

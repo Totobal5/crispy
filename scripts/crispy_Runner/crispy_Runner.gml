@@ -17,6 +17,12 @@ function CrispyRunner(_name, _unpack = undefined) : CrispyTest(_name) constructo
 	__logs = [];
 	/// @ignore
 	__discovered = undefined;
+	/// @ignore
+	__current_suite_index = 0;
+	/// @ignore
+	__is_running = false;
+	/// @ignore
+	__is_complete = false;
 
 	/// Run struct unpacker if unpack argument was provided
 	/// Stays after all variables are initialized so they may be overwritten
@@ -45,10 +51,13 @@ function CrispyRunner(_name, _unpack = undefined) : CrispyTest(_name) constructo
 			break;
 
 			case "CrispyCase":
+			case "CrispyCaseAsync":
 				var _case_logs_len = array_length(_input.__logs);
 				var _case_pass = true;
 				var _case_msg = undefined;
 				var _case_helper_text = undefined;
+				var _failure_lines = [];
+				var _failure_index = 0;
 
 				_i = 0; repeat (_case_logs_len)
 				{
@@ -56,19 +65,41 @@ function CrispyRunner(_name, _unpack = undefined) : CrispyTest(_name) constructo
 					if (!_log.__pass)
 					{
 						_case_pass = false;
+						++_failure_index;
 
-						if (is_undefined(_case_msg) && !is_undefined(_log.__msg) && _log.__msg != "")
+						var _line = "";
+						if (!is_undefined(_log.__msg) && _log.__msg != "")
 						{
-							_case_msg = _log.__msg;
+							_line = _log.__msg;
+						}
+						else if (!is_undefined(_log.__helper_text) && _log.__helper_text != "")
+						{
+							_line = _log.__helper_text;
+						}
+						else
+						{
+							_line = "Assertion failed.";
 						}
 
-						if (is_undefined(_case_helper_text) && !is_undefined(_log.__helper_text) && _log.__helper_text != "")
-						{
-							_case_helper_text = _log.__helper_text;
-						}
+						array_push(_failure_lines, $"[{string(_failure_index)}] {_line}");
 					}
 
 					++_i;
+				}
+
+				if (!_case_pass)
+				{
+					_case_msg = $"{string(_failure_index)} assertion failure(s)";
+
+					var _details = "";
+					var _j = 0; repeat (array_length(_failure_lines))
+					{
+						if (_j > 0) _details += "\n";
+						_details += _failure_lines[_j];
+						++_j;
+					}
+
+					_case_helper_text = _details;
 				}
 
 				AddLog(new CrispyLog(_input, {
@@ -122,25 +153,46 @@ function CrispyRunner(_name, _unpack = undefined) : CrispyTest(_name) constructo
 		var _hr = ""; repeat(_count) { _hr += _str; }
 		return _hr;
 	}
+
+	/// @description Returns whether the runner is currently active.
+	/// @returns {Bool}
+	static IsRunning = function()
+	{
+		return __is_running;
+	}
+
+	/// @description Returns whether the runner has completed its current run.
+	/// @returns {Bool}
+	static IsComplete = function()
+	{
+		return __is_complete;
+	}
 	
 	/// @description Runs test suites and logs results
-	/// @returns {Void}
+	/// @returns {Struct.CrispyRunner} Self for chaining
 	static Run = function()
 	{
 		SetUp();
-		var _i = 0; repeat(array_length(__suites) )
+		__current_suite_index = 0;
+		__is_running = true;
+		__is_complete = false;
+		__AdvanceSuites();
+
+		return self;
+	}
+
+	/// @description Updates the active suite and advances the run when async suites complete.
+	/// @returns {Struct.CrispyRunner} Self for chaining
+	static Update = function()
+	{
+		if (!__is_running)
 		{
-			OnRunBegin();
-
-			__suites[_i].Run();
-
-			CaptureLogs(__suites[_i]);
-			OnRunEnd();
-
-			++_i;
+			return self;
 		}
 
-		TearDown();
+		__AdvanceSuites();
+
+		return self;
 	}
 
 	/// @description Clears logs, starts timer, and runs __SetUp
@@ -163,7 +215,47 @@ function CrispyRunner(_name, _unpack = undefined) : CrispyTest(_name) constructo
 		{
 			__logs = [];
 			__start_time = get_timer();
+			__is_complete = false;
 			if (is_method(__SetUp)) { __SetUp(); }
+		}
+
+		return self;
+	}
+
+	/// @ignore
+	static __AdvanceSuites = function()
+	{
+		var _len = array_length(__suites);
+		while (__current_suite_index < _len)
+		{
+			var _suite = __suites[__current_suite_index];
+
+			if (!_suite.IsRunning() && !_suite.IsComplete())
+			{
+				OnRunBegin();
+				_suite.Run();
+			}
+			else if (_suite.IsRunning())
+			{
+				_suite.Update();
+			}
+
+			if (_suite.IsComplete())
+			{
+				CaptureLogs(_suite);
+				OnRunEnd();
+				++__current_suite_index;
+				continue;
+			}
+
+			return self;
+		}
+
+		if (__is_running)
+		{
+			__is_running = false;
+			__is_complete = true;
+			TearDown();
 		}
 
 		return self;
@@ -285,10 +377,21 @@ function CrispyRunner(_name, _unpack = undefined) : CrispyTest(_name) constructo
 		if (is_undefined(__discovered))
 		{
 			__discovered = [];
-			var _i = 100001; // Range of custom scripts is 100000 onwards
-			while (true)
+			var _i = 100000; // Range of custom scripts is 100000 onwards
+			var _missing_streak = 0;
+			var _max_missing_streak = 2048;
+
+			// Script IDs can contain gaps, so keep scanning until enough consecutive misses suggest the range ended.
+			while (_missing_streak < _max_missing_streak)
 			{
-				if (!script_exists(_i) ) { break; }
+				if (!script_exists(_i) )
+				{
+					++_missing_streak;
+					++_i;
+					continue;
+				}
+
+				_missing_streak = 0;
 				
 				var _script_name = script_get_name(_i);
 				// Skip adding functions that are not named script functions
@@ -306,6 +409,11 @@ function CrispyRunner(_name, _unpack = undefined) : CrispyTest(_name) constructo
 				
 				if (CRISPY_DEBUG) { __crispy_alert($"Discovered script function: {_script_name} ({string(_i)})."); }
 				++_i;
+			}
+
+			if (CRISPY_DEBUG)
+			{
+				__crispy_alert($"Stopped discovery scan after {_max_missing_streak} consecutive missing script IDs.");
 			}
 		}
 
@@ -347,7 +455,11 @@ function CrispyRunner(_name, _unpack = undefined) : CrispyTest(_name) constructo
 			var _script_name = _script.name;
 			if (string_length(_script_name) >= _pattern_len && string_copy(_script_name, 1, _pattern_len) == _script_start_pattern)
 			{
-				var _test_case = new CrispyCase(_script_name, function(){});
+				var _is_async_script = (string_pos("_async", _script_name) > 0);
+				var _test_case = _is_async_script
+					? new CrispyCaseAsync(_script_name)
+					: new CrispyCase(_script_name, function(){});
+
 				_test_case.__Discover(_script.func);
 				_test_suite.AddCase(_test_case);
 				_script.discovered = true;

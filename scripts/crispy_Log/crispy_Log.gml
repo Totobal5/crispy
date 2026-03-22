@@ -113,13 +113,25 @@ function CrispyLog(_test_case, _unpack = undefined) constructor
 				}
 				else
 				{
+					var _has_msg = !is_undefined(__msg) && __msg != "";
+					var _has_helper_text = !is_undefined(__helper_text) && __helper_text != "";
+
 					if (!is_undefined(__msg) && __msg != "")
 					{
 						_msg += "- " + __msg;
+
+						if (_has_helper_text)
+						{
+							_msg += "\n" + __helper_text;
+						}
 					}
-					else if (!is_undefined(__helper_text))
+					else if (_has_helper_text)
 					{
 						_msg += "- " + __helper_text;
+					}
+					else if (!_has_msg && !_has_helper_text)
+					{
+						_msg += "- Assertion failed.";
 					}
 				}
 			break;
