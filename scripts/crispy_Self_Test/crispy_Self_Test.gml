@@ -254,8 +254,9 @@ function test_crispy_case_async_step_checkpoint_completes()
 
 	_case
 		.WaitStep(function() {
-			++async_calls;
-			AssertEqual(async_calls, 1, "Step checkpoint should run exactly once");
+			var _hits = struct_get(self, "async_calls") + 1;
+			struct_set(self, "async_calls", _hits);
+			AssertEqual(struct_get(self, "async_calls"), 1, "Step checkpoint should run exactly once");
 			return true;
 		})
 		.Timeout(10, "frames");
@@ -282,6 +283,46 @@ function test_crispy_case_async_timeout_fails_case()
 
 	AssertTrue(_case.IsComplete(), "Async case should complete after timeout");
 	AssertFalse(_case.__logs[0].__pass, "Timeout should produce a failing log");
+}
+
+function test_crispy_case_async_callback_context_defaults_to_case()
+{
+	var _case = new CrispyCaseAsync("async_context_default_case");
+
+	_case
+		.WaitStep(function() {
+			callback_flag = true;
+			return true;
+		})
+		.Timeout(10, "frames");
+
+	_case.Start();
+	_case.OnBeginStep();
+	_case.OnStep();
+
+	AssertTrue(_case.IsComplete(), "Async case should complete with default context callback");
+	AssertTrue(_case.callback_flag, "Default callback context should be the async case");
+}
+
+function test_crispy_case_async_callback_context_can_be_custom()
+{
+	var _context = {
+		hits: 0,
+	};
+
+	var _case = new CrispyCaseAsync("async_context_custom_case")
+		.WaitStep(function() {
+			++hits;
+			return hits >= 1;
+		}, _context)
+		.Timeout(10, "frames");
+
+	_case.Start();
+	_case.OnBeginStep();
+	_case.OnStep();
+
+	AssertTrue(_case.IsComplete(), "Async case should complete with custom context callback");
+	AssertEqual(_context.hits, 1, "Custom callback context should update its own state");
 }
 
 // ==================== CrispySuite Tests ====================

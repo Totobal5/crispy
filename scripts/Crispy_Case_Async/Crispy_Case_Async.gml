@@ -90,26 +90,29 @@ function CrispyCaseAsync(_name, _unpack = undefined) : CrispyCase(_name, functio
 
 	/// @description Queue a callback to run on Begin Step.
 	/// @param {Function} func - Callback for Begin Step
+	/// @param {Struct|Real} [context=undefined] - Execution context for callback. Defaults to this async case.
 	/// @returns {Struct.CrispyCaseAsync} Self for chaining
-	static WaitBeginStep = function(_func)
+	static WaitBeginStep = function(_func, _context)
 	{
-		return __QueueCheckpoint("begin_step", _func, "WaitBeginStep");
+		return __QueueCheckpoint("begin_step", _func, "WaitBeginStep", _context);
 	}
 
 	/// @description Queue a callback to run on Step.
 	/// @param {Function} func - Callback for Step
+	/// @param {Struct|Real} [context=undefined] - Execution context for callback. Defaults to this async case.
 	/// @returns {Struct.CrispyCaseAsync} Self for chaining
-	static WaitStep = function(_func)
+	static WaitStep = function(_func, _context)
 	{
-		return __QueueCheckpoint("step", _func, "WaitStep");
+		return __QueueCheckpoint("step", _func, "WaitStep", _context);
 	}
 
 	/// @description Queue a callback to run on End Step.
 	/// @param {Function} func - Callback for End Step
+	/// @param {Struct|Real} [context=undefined] - Execution context for callback. Defaults to this async case.
 	/// @returns {Struct.CrispyCaseAsync} Self for chaining
-	static WaitEndStep = function(_func)
+	static WaitEndStep = function(_func, _context)
 	{
-		return __QueueCheckpoint("end_step", _func, "WaitEndStep");
+		return __QueueCheckpoint("end_step", _func, "WaitEndStep", _context);
 	}
 
 	/// @description Manually completes the async case.
@@ -252,17 +255,31 @@ function CrispyCaseAsync(_name, _unpack = undefined) : CrispyCase(_name, functio
 	}
 
 	/// @ignore
-	static __QueueCheckpoint = function(_event_name, _func, _method_name)
+	static __QueueCheckpoint = function(_event_name, _func, _method_name, _context)
 	{
-		var _bound = __crispy_validate_and_bind_method(instanceof(self), _method_name, _func);
-		if (is_undefined(_bound))
+		if (!is_method(_func))
 		{
+			__crispy_error($"{instanceof(self)}.{_method_name}() \"func\" expected a function, received {typeof(_func)}.");
 			return self;
 		}
+
+		if (!is_undefined(_context))
+		{
+			var _is_instance_context = is_real(_context) && instance_exists(_context);
+			if (!is_struct(_context) && !_is_instance_context)
+			{
+				__crispy_error($"{instanceof(self)}.{_method_name}() \"context\" expected a struct, instance id, or undefined, received {typeof(_context)}.");
+				return self;
+			}
+		}
+
+		var _callback_context = is_undefined(_context) ? self : _context;
+		var _bound = method(_callback_context, _func);
 
 		array_push(__checkpoints, {
 			event_name: _event_name,
 			callback: _bound,
+			context: _callback_context,
 		});
 
 		return self;

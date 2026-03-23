@@ -8,7 +8,7 @@ if (CRISPY_RUN)
 	} 
 	else 
 	{
-		if (is_method(runner.IsRunning) && runner.IsRunning())
+		if (runner.IsRunning() )
 		{
 			runner.Update();
 		}
