@@ -1,13 +1,13 @@
+/// @ignore [MAJOR.MINOR.PATH]
+#macro CRISPY_VERSION   "2.2.4"
 /// @ignore
 #macro CRISPY_NAME      "Crispy"
 /// @ignore
 #macro CRISPY_AUTHOR    "Brent Frymire"
 /// @ignore
 #macro CRISPY_REPO      "https://github.com/bfrymire/crispy"
-/// @ignore [MAJOR.MINOR.PATH]
-#macro CRISPY_VERSION   "2.2.4"
 /// @ignore yyyy-mm-dd
-#macro CRISPY_DATE      "2025-11-26"
+#macro CRISPY_DATE      "2026-05-03"
 
 /// @ignore Boolean flag that can be used to automatically run tests
 #macro CRISPY_RUN           true
