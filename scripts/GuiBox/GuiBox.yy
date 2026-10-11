@@ -6,7 +6,7 @@
   "name":"GuiBox",
   "parent":{
     "name":"GUI",
-    "path":"folders/Scripts/GUI.yy",
+    "path":"folders/Unit Tests/Scripts/GUI.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

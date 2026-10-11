@@ -1,85 +1,113 @@
-/// @description Creates an asynchronous test case driven by Begin Step, Step, and End Step events.
-/// @param {String} name - Name of case
-/// @param {Struct} [unpack=undefined] - Struct for struct_unpack
-function CrispyCaseAsync(_name, _unpack = undefined) : CrispyCase(_name, function(){}, _unpack) constructor
+/// @desc Creates an asynchronous test case driven by Begin Step, Step, and End Step events.
+/// @param {String} name Name of case
+function CrispyCaseAsync(_name) : CrispyCase(_name, function(){}) constructor
 {
 	/// @ignore
+	/// @desc Whether this case is asynchronous
+	/// @type {Bool}
 	__is_async = true;
+	
 	/// @ignore
+	/// @desc Whether this case is currently running
+	/// @type {Bool}
 	__is_running = false;
+
 	/// @ignore
+	/// @desc Whether this case has completed
+	/// @type {Bool}
 	__is_complete = false;
+
 	/// @ignore
+	/// @desc Host instance that relays step events to this case.
+	/// @type {Real}
 	__host_id = noone;
+
 	/// @ignore
+	/// @desc Array of checkpoints for this async case
+	/// @type {Array}
 	__checkpoints = [];
+
 	/// @ignore
+	/// @desc Index of the current checkpoint
+	/// @type {Real}
 	__current_checkpoint = 0;
+
 	/// @ignore
+	/// @desc Value of the timeout for this async case
+	/// @type {Real}
 	__timeout_value = undefined;
+
 	/// @ignore
+	/// @desc Unit of the timeout for this async case
+	/// @type {String}
 	__timeout_unit = undefined;
+
 	/// @ignore
+	/// @desc Number of frames elapsed since the async case started
+	/// @type {Real}
 	__elapsed_frames = 0;
+
 	/// @ignore
+	/// @desc Timestamp of when the async case started running
+	/// @type {Real}
 	__run_started_at = 0;
+
 	/// @ignore
+	/// @desc Whether the suite is waiting for this async case to finish before finalizing
+	/// @type {Bool}
 	__suite_on_run_end_pending = false;
+
 	/// @ignore
+	/// @desc Whether this async case was discovered via a script
+	/// @type {Bool}
 	__rebuild_on_start = false;
 
 	#region METHODS
 
-	/// @description Returns whether this case is asynchronous.
+	/// @desc Returns whether this case is asynchronous.
 	/// @returns {Bool}
 	static IsAsync = function()
 	{
 		return __is_async;
 	}
 
-	/// @description Returns whether this case is currently running.
+	/// @desc Returns whether this case is currently running.
 	/// @returns {Bool}
 	static IsRunning = function()
 	{
 		return __is_running;
 	}
 
-	/// @description Returns whether this case has finished running.
+	/// @desc Returns whether this case has finished running.
 	/// @returns {Bool}
 	static IsComplete = function()
 	{
 		return __is_complete;
 	}
 
-	/// @description Alias for IsComplete.
+	/// @desc Alias for IsComplete.
 	/// @returns {Bool}
 	static IsFinished = function()
 	{
 		return __is_complete;
 	}
 
-	/// @description Sets a timeout for this async case.
-	/// @param {Real} value - Timeout amount
-	/// @param {String} [unit="frames"] - Either "frames" or "seconds"
+	/// @desc Sets a timeout for this async case.
+	/// @param {Real} value Timeout amount
+	/// @param {String} [unit="frames"] Either "frames" or "seconds"
 	/// @returns {Struct.CrispyCaseAsync} Self for chaining
 	static Timeout = function(_value, _unit = "frames")
 	{
-		if (!is_real(_value))
-		{
-			__crispy_error($"{instanceof(self)}.Timeout() \"value\" expected a real number, received {typeof(_value)}.");
-			return self;
-		}
-
 		if (!is_string(_unit))
 		{
-			__crispy_error($"{instanceof(self)}.Timeout() \"unit\" expected a string, received {typeof(_unit)}.");
-			return self;
+			__crispy_alert($"CrispyCaseAsync.Timeout() 'unit' expected a string, received {typeof(_unit)}, defaulting to 'frames'.");
+			_unit = "frames";
 		}
 
 		if (_unit != "frames" && _unit != "seconds")
 		{
-			__crispy_error($"{instanceof(self)}.Timeout() \"unit\" expected either \"frames\" or \"seconds\", received {_unit}.");
-			return self;
+			__crispy_alert($"CrispyCaseAsync.Timeout() 'unit' expected either 'frames' or 'seconds', received {_unit}.");
+			_unit = "frames";
 		}
 
 		__timeout_value = _value;
@@ -88,59 +116,56 @@ function CrispyCaseAsync(_name, _unpack = undefined) : CrispyCase(_name, functio
 		return self;
 	}
 
-	/// @description Queue a callback to run on Begin Step.
-	/// @param {Function} func - Callback for Begin Step
-	/// @param {Struct|Real} [context=undefined] - Execution context for callback. Defaults to this async case.
+	/// @desc Queue a callback to run on Begin Step.
+	/// @param {Function} callback Callback for Begin Step
+	/// @param {Struct|Real} [context=undefined] Execution context for callback. Defaults to this async case.
 	/// @returns {Struct.CrispyCaseAsync} Self for chaining
 	static WaitBeginStep = function(_func, _context)
 	{
 		return __QueueCheckpoint("begin_step", _func, "WaitBeginStep", _context);
 	}
 
-	/// @description Queue a callback to run on Step.
-	/// @param {Function} func - Callback for Step
-	/// @param {Struct|Real} [context=undefined] - Execution context for callback. Defaults to this async case.
+	/// @desc Queue a callback to run on Step.
+	/// @param {Function} callback Callback for Step
+	/// @param {Struct|Real} [context=undefined] Execution context for callback. Defaults to this async case.
 	/// @returns {Struct.CrispyCaseAsync} Self for chaining
 	static WaitStep = function(_func, _context)
 	{
 		return __QueueCheckpoint("step", _func, "WaitStep", _context);
 	}
 
-	/// @description Queue a callback to run on End Step.
-	/// @param {Function} func - Callback for End Step
-	/// @param {Struct|Real} [context=undefined] - Execution context for callback. Defaults to this async case.
+	/// @desc Queue a callback to run on End Step.
+	/// @param {Function} callback Callback for End Step
+	/// @param {Struct|Real} [context=undefined] Execution context for callback. Defaults to this async case.
 	/// @returns {Struct.CrispyCaseAsync} Self for chaining
 	static WaitEndStep = function(_func, _context)
 	{
 		return __QueueCheckpoint("end_step", _func, "WaitEndStep", _context);
 	}
 
-	/// @description Manually completes the async case.
+	/// @desc Manually completes the async case.
 	/// @returns {Struct.CrispyCaseAsync} Self for chaining
 	static Complete = function()
 	{
-		if (__is_complete)
-		{
-			return self;
-		}
-
+		if (__is_complete) return self;
+		
 		__is_running = false;
 		__is_complete = true;
 		__DestroyHost();
+
 		OnRunEnd();
 		TearDown();
+
 		__duration = (get_timer() - __run_started_at) / 1000000;
 
 		return self;
 	}
 
-	/// @description Fails the async case and completes it.
-	/// @param {String} [message="Async case failed."] - Failure message
+	/// @desc Fails the async case and completes it.
+	/// @param {String} [message="Async case failed."] Failure message
 	/// @returns {Struct.CrispyCaseAsync} Self for chaining
 	static Fail = function(_message = "Async case failed.")
 	{
-		if (!__crispy_validate_message_param(instanceof(self), "Fail", _message)) return self;
-
 		AddLog(new CrispyLog(self, {
 			__pass: false,
 			__msg: _message,
@@ -149,7 +174,7 @@ function CrispyCaseAsync(_name, _unpack = undefined) : CrispyCase(_name, functio
 		return Complete();
 	}
 
-	/// @description Starts the async case and creates its host instance.
+	/// @desc Starts the async case and creates its host instance.
 	/// @returns {Struct.CrispyCaseAsync} Self for chaining
 	static Start = function()
 	{
@@ -158,6 +183,7 @@ function CrispyCaseAsync(_name, _unpack = undefined) : CrispyCase(_name, functio
 			__is_running = false;
 			__is_complete = true;
 			__duration = 0;
+
 			return self;
 		}
 
@@ -179,29 +205,27 @@ function CrispyCaseAsync(_name, _unpack = undefined) : CrispyCase(_name, functio
 
 		__CreateHost();
 
-		if (array_length(__checkpoints) == 0)
-		{
-			Complete();
-		}
+		if (array_length(__checkpoints) == 0) { Complete(); }
 
 		return self;
 	}
 
-	/// @description Compatibility alias for asynchronous execution.
+	/// @desc Compatibility alias for asynchronous execution.
 	/// @returns {Struct.CrispyCaseAsync} Self for chaining
 	static Run = function()
 	{
 		return Start();
 	}
 
-	/// @description Configure this async case using a builder function executed at Start.
-	/// @param {Function} func - Builder that queues checkpoints
+	/// @desc Configure this async case using a builder callback executed at Start.
+	/// @param {Function} callback Callback that queues checkpoints
 	/// @returns {Struct.CrispyCaseAsync} Self for chaining
 	static Configure = function(_func)
 	{
-		var _bound = __crispy_validate_and_bind_method(instanceof(self), "Configure", _func);
-		if (is_undefined(_bound))
+		var _bound = is_callable(_func) ? method(self, _func) : undefined;
+		if (is_undefined(_bound) )
 		{
+			__crispy_error($"CrispyCaseAsync.Configure() 'callback' expected a callable value, received {typeof(_func)}.");
 			return self;
 		}
 
@@ -211,7 +235,7 @@ function CrispyCaseAsync(_name, _unpack = undefined) : CrispyCase(_name, functio
 		return self;
 	}
 
-	/// @description Handles Begin Step from the async host.
+	/// @desc Handles Begin Step from the async host.
 	/// @returns {Struct.CrispyCaseAsync} Self for chaining
 	static OnBeginStep = function()
 	{
@@ -224,7 +248,7 @@ function CrispyCaseAsync(_name, _unpack = undefined) : CrispyCase(_name, functio
 		return self;
 	}
 
-	/// @description Handles Step from the async host.
+	/// @desc Handles Step from the async host.
 	/// @returns {Struct.CrispyCaseAsync} Self for chaining
 	static OnStep = function()
 	{
@@ -236,7 +260,7 @@ function CrispyCaseAsync(_name, _unpack = undefined) : CrispyCase(_name, functio
 		return self;
 	}
 
-	/// @description Handles End Step from the async host.
+	/// @desc Handles End Step from the async host.
 	/// @returns {Struct.CrispyCaseAsync} Self for chaining
 	static OnEndStep = function()
 	{
@@ -255,20 +279,26 @@ function CrispyCaseAsync(_name, _unpack = undefined) : CrispyCase(_name, functio
 	}
 
 	/// @ignore
+	/// @desc Queues a checkpoint for this async case.
+	/// @param {String} event_name Name of the event to wait for
+	/// @param {Function} callback Callback for the checkpoint
+	/// @param {String} method_name Name of the method calling this function (for error messages)
+	/// @param {Struct|Real} context Execution context for the callback
+	/// @returns {Struct.CrispyCaseAsync} Self for chaining
 	static __QueueCheckpoint = function(_event_name, _func, _method_name, _context)
 	{
-		if (!is_method(_func))
+		if (!is_callable(_func) )
 		{
-			__crispy_error($"{instanceof(self)}.{_method_name}() \"func\" expected a function, received {typeof(_func)}.");
+			__crispy_error($"CrispyCaseAsync.{_method_name}() 'callback' expected a callable value, received {typeof(_func)}.");
 			return self;
 		}
 
-		if (!is_undefined(_context))
+		if (!is_undefined(_context) )
 		{
 			var _is_instance_context = is_real(_context) && instance_exists(_context);
 			if (!is_struct(_context) && !_is_instance_context)
 			{
-				__crispy_error($"{instanceof(self)}.{_method_name}() \"context\" expected a struct, instance id, or undefined, received {typeof(_context)}.");
+				__crispy_error($"CrispyCaseAsync.{_method_name}() 'context' expected a struct, instance id, or undefined, received {typeof(_context)}.");
 				return self;
 			}
 		}
@@ -278,25 +308,21 @@ function CrispyCaseAsync(_name, _unpack = undefined) : CrispyCase(_name, functio
 
 		array_push(__checkpoints, {
 			event_name: _event_name,
-			callback: _bound,
-			context: _callback_context,
+			callback:	_bound,
+			context:	_callback_context,
 		});
 
 		return self;
 	}
 
 	/// @ignore
+	/// @desc Handles an event from the async host and executes the corresponding checkpoint callback.
+	/// @param {String} event_name Name of the event to handle
+	/// @returns {Struct.CrispyCaseAsync} Self for chaining
 	static __HandleEvent = function(_event_name)
 	{
-		if (__is_complete || !__is_running)
-		{
-			return self;
-		}
-
-		if (__current_checkpoint >= array_length(__checkpoints))
-		{
-			return Complete();
-		}
+		if (__is_complete || !__is_running) { return self; }
+		if (__current_checkpoint >= array_length(__checkpoints) ) { return Complete(); }
 
 		var _checkpoint = __checkpoints[__current_checkpoint];
 		if (_checkpoint.event_name != _event_name)
@@ -305,39 +331,33 @@ function CrispyCaseAsync(_name, _unpack = undefined) : CrispyCase(_name, functio
 			return self;
 		}
 
-		var _result = _checkpoint.callback();
-		if (is_bool(_result))
+		if (is_real(_checkpoint.context) && !instance_exists(_checkpoint.context))
 		{
-			if (_result)
-			{
-				++__current_checkpoint;
-			}
+			return Fail("Async callback context no longer exists.");
+		}
+
+		var _result = _checkpoint.callback();
+		if (is_bool(_result) )
+		{
+			if (_result) {++__current_checkpoint;}
 		}
 		else
 		{
 			++__current_checkpoint;
 		}
 
-		if (__current_checkpoint >= array_length(__checkpoints) && __is_running)
-		{
-			Complete();
-		}
-
-		if (__is_running)
-		{
-			__CheckTimeout();
-		}
+		if (__current_checkpoint >= array_length(__checkpoints) && __is_running) Complete();
+		if (__is_running) __CheckTimeout();
 
 		return self;
 	}
 
 	/// @ignore
+	/// @desc Checks if the async case has timed out and fails it if so.
+	/// @returns {Bool} True if timed out, false otherwise
 	static __CheckTimeout = function()
 	{
-		if (is_undefined(__timeout_value) || is_undefined(__timeout_unit))
-		{
-			return false;
-		}
+		if (is_undefined(__timeout_value) || is_undefined(__timeout_unit) ) return false;
 
 		var _timed_out = false;
 		switch (__timeout_unit)
@@ -361,9 +381,12 @@ function CrispyCaseAsync(_name, _unpack = undefined) : CrispyCase(_name, functio
 	}
 
 	/// @ignore
+	/// @desc Creates a host instance to manage the async case's lifecycle.
+	/// @returns {Struct.CrispyCaseAsync} Self for chaining
 	static __CreateHost = function()
 	{
-		if (instance_exists(__host_id))
+		// Destroy any existing host instance before creating a new one
+		if (instance_exists(__host_id) )
 		{
 			with (__host_id) instance_destroy();
 		}
@@ -374,9 +397,11 @@ function CrispyCaseAsync(_name, _unpack = undefined) : CrispyCase(_name, functio
 	}
 
 	/// @ignore
+	/// @desc Destroys the host instance managing the async case's lifecycle.
+	/// @returns {Struct.CrispyCaseAsync} Self for chaining
 	static __DestroyHost = function()
 	{
-		if (instance_exists(__host_id))
+		if (instance_exists(__host_id) )
 		{
 			with (__host_id) instance_destroy();
 		}
@@ -384,20 +409,21 @@ function CrispyCaseAsync(_name, _unpack = undefined) : CrispyCase(_name, functio
 		__host_id = noone;
 	}
 
-	/// @description Sets up a discovered script to use as the async test builder.
-	/// @param {Real} script - Index ID of script
 	/// @ignore
+	/// @desc Sets up a discovered script to use as the async test builder.
+	/// @param {Real} script Index ID of script
+	/// @returns {Struct.CrispyCaseAsync} Self for chaining
 	static __Discover = function(_script)
 	{
-		if (!is_real(_script))
+		if (!is_real(_script) )
 		{
-			__crispy_error($"{instanceof(self)}.__Discover() \"script\" expected a real number, received {typeof(_script)}.");
+			__crispy_error($"CrispyCaseAsync.__Discover() 'script' expected a real number, received {typeof(_script)}.");
 			return self;
 		}
 
 		if (!script_exists(_script))
 		{
-			__crispy_error($"{instanceof(self)}.__Discover() asset of index {_script} is not a script function.");
+			__crispy_error($"CrispyCaseAsync.__Discover() asset of index {_script} is not a script function.");
 			return self;
 		}
 

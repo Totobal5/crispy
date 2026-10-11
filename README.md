@@ -1,37 +1,152 @@
-<div align="center">
-   <img src="https://raw.githubusercontent.com/bfrymire/crispy/master/LOGO.png" style="margin:auto;" alt="Crispy Logo">
-</div>
+# Crispy
 
-<h1 align="center">
-   Crispy v1.9.0
-</h1>
+`@toto/Crispy` is a unit testing framework for GameMaker projects. It organizes tests into runners, suites, and cases, supports automatic discovery, and can run asynchronous tests across GameMaker step events.
 
-<p align="center">
-   Unit testing framework built in GML for GameMaker LTS 2022+
-</p>
+## What It Provides
 
-## Installation
+- `CrispyRunner` to execute suites and collect their results.
+- `CrispySuite` to group related test cases and define suite callbacks.
+- `CrispyCase` with assertions for values, errors, arrays, strings, and deep equality.
+- `CrispyCaseAsync` for tests driven by Begin Step, Step, and End Step.
+- `CrispyRunner.Discover()` for convention-based test discovery.
+- `crispy_vars()` for state shared by the test hierarchy.
+- Configurable output, verbosity, timing, and error behavior.
 
-1. [Download the **.yymps** file](https://github.com/bfrymire/crispy/releases/latest)
-1. Import the **.yymps** file into your project from the top menu
-    * Tools **>** Import Local Package
+## Quick Start
 
-You can also drop the **.yymps** file downloaded from the [Releases](https://github.com/bfrymire/crispy/releases/latest) tab directly onto your GameMaker IDE and follow the prompts.
+Create a runner, add a suite and one or more cases, then run the runner:
 
-## Documentation
+```gml
+var runner = new CrispyRunner("gameplay");
+var suite = new CrispySuite("player");
 
-To learn more about how to use Crispy, read the [documentation](https://bfrymire.github.io/crispy).
+suite.AddCase(new CrispyCase("starts with health", function()
+{
+   var health = 100;
+   AssertEqual(health, 100);
+}));
 
-## Getting Started
+runner.AddTestSuite(suite);
+runner.Run();
+```
 
-A good starting point is copying and pasting the example code from the [Wiki's Quick Start page](https://bfrymire.github.io/crispy/#/Quick-Start?id=getting-started) into the Create Event of an object created specifically for running tests.
+Crispy writes the result summary to the Output window. Cases can contain multiple chained assertions:
 
-Expand upon the example code to suit your testing needs.
+```gml
+function test_player_defaults()
+{
+   var player = {
+      health: 100,
+      alive: true,
+   };
 
-## Attributions
+   AssertEqual(player.health, 100)
+      .AssertTrue(player.alive);
+}
+```
 
-* Example project color palette from [Dracula Theme](https://github.com/dracula/dracula-theme#color-palette)
+## Suites And Callbacks
+
+A suite runs `SetUp()` before its cases and `TearDown()` after they finish. `OnRunBegin()` and `OnRunEnd()` run around each case in the suite.
+
+```gml
+var suite = new CrispySuite("inventory")
+   .SetUp(function()
+   {
+      crispy_vars().items = [];
+   })
+   .TearDown(function()
+   {
+      crispy_vars().items = undefined;
+   });
+```
+
+`crispy_vars()` returns the shared struct used by runners, suites, and cases. Use it for state that a suite prepares and its cases consume.
+
+## Test Discovery
+
+Define global functions with a shared prefix, add the target suite to the runner, then discover the functions:
+
+```gml
+function test_inventory_starts_empty()
+{
+   AssertEqual(array_length(crispy_vars().items), 0);
+}
+
+var runner = new CrispyRunner("gameplay");
+var suite = new CrispySuite("inventory");
+
+runner.AddTestSuite(suite);
+runner.Discover(suite, "test_inventory_");
+runner.Run();
+```
+
+Each discovered function becomes a `CrispyCase`. A discovered function whose name contains `_async` becomes a `CrispyCaseAsync`.
+
+## Assertions
+
+All assertions accept an optional final message and return the case for chaining.
+
+- `AssertEqual(first, second, [message])`
+- `AssertNotEqual(first, second, [message])`
+- `AssertDeepEqual(first, second, [message])`
+- `AssertNear(actual, expected, tolerance, [message])`
+- `AssertContains(container, value, [message])`
+- `AssertTrue(expr, [message])` and `AssertFalse(expr, [message])`
+- `AssertIsNoone(expr, [message])` and `AssertIsNotNoone(expr, [message])`
+- `AssertIsUndefined(expr, [message])` and `AssertIsNotUndefined(expr, [message])`
+- `AssertRaises(callback, [message])`
+- `AssertRaiseErrorValue(callback, value, [message])`
+- `AssertDoesNotThrow(callback, [message])`
+
+## Asynchronous Tests
+
+Use `CrispyCaseAsync` to wait for Begin Step, Step, or End Step. A callback that returns `true` advances to the next checkpoint. A callback that returns `false` waits and runs again on the next matching event; any non-boolean return value advances immediately.
+
+```gml
+var async_case = new CrispyCaseAsync("waits for a step")
+   .WaitStep(function()
+   {
+      AssertTrue(true);
+      return true;
+   })
+   .Timeout(120, "frames");
+
+var suite = new CrispySuite("async");
+suite.AddCase(async_case);
+
+var runner = new CrispyRunner("gameplay");
+runner.AddTestSuite(suite);
+runner.Run();
+```
+
+Call `runner.Update()` from a Step event while asynchronous tests are active:
+
+```gml
+runner.Update();
+```
+
+`Timeout(value, "frames")` is the default. Use `Timeout(value, "seconds")` for a time-based limit.
+
+## Configuration
+
+Set the exported macros in `crispy_Config` before running tests.
+
+| Macro | Default | Effect |
+| --- | --- | --- |
+| `CRISPY_RUN` | `true` | Flag available to control automatic test execution. |
+| `CRISPY_LOG_ALERTS` | `false` | Writes Crispy alerts to the Output window. |
+| `CRISPY_LOG_ERRORS` | `false` | Writes internal Crispy errors to the Output window. |
+| `CRISPY_FATAL_ERRORS` | `true` | Stops execution when Crispy reports an internal error. |
+| `CRISPY_VERBOSITY` | `2` | Controls log detail: `0`, `1`, or `2`. |
+| `CRISPY_TIME_PRECISION` | `6` | Decimal places used for total run time. |
+| `CRISPY_PASS_MSG_SILENT` | `"."` | Text used for a passing assertion at verbosity `0`. |
+| `CRISPY_FAIL_MSG_SILENT` | `"F"` | Text used for a failing assertion at verbosity `0`. |
+| `CRISPY_PASS_MSG_VERBOSE` | `"Ok"` | Text used for a passing test at verbose output. |
+| `CRISPY_FAIL_MSG_VERBOSE` | `"Fail"` | Text used for a failing test at verbose output. |
+| `CRISPY_SILENCE_PASSING_TESTS_OUTPUT` | `false` | Suppresses individual passing result messages. |
+| `CRISPY_STATUS_OUTPUT_LENGTH` | `150` | Number of compact status characters per output row. Set to `0` to hide them. |
 
 ## License
 
-[MIT License](https://github.com/bfrymire/crispy/blob/master/LICENSE)
+[MIT License](LICENSE)

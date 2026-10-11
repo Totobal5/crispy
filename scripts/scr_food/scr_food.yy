@@ -6,7 +6,7 @@
   "name":"scr_food",
   "parent":{
     "name":"Food",
-    "path":"folders/Scripts/Food.yy",
+    "path":"folders/Unit Tests/Scripts/Food.yy",
   },
   "resourceType":"GMScript",
   "resourceVersion":"2.0",

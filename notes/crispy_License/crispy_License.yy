@@ -1,0 +1,11 @@
+{
+  "$GMNotes":"v2",
+  "%Name":"crispy_License",
+  "name":"crispy_License",
+  "parent":{
+    "name":"crispy",
+    "path":"crispy.yyp",
+  },
+  "resourceType":"GMNotes",
+  "resourceVersion":"2.0",
+}

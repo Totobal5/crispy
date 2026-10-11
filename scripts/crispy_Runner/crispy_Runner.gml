@@ -1,37 +1,61 @@
-/// @description Runner to hold test suites and iterates through each CrispySuite, running its tests
+/// @desc Runner to hold test suites and iterates through each CrispySuite, running its tests
 /// @param {String} name - Name of runner
-/// @param {Struct} [unpack=undefined] - Struct for crispy_struct_unpack
-function CrispyRunner(_name, _unpack = undefined) : CrispyTest(_name) constructor
+function CrispyRunner(_name) : CrispyTest(_name) constructor
 {
 	/// @ignore
+	/// @desc Start time of the runner
+	/// @type {Real}
 	__start_time = 0;
-	/// @ignore
-	__stop_time = 0;
-	/// @ignore
-	__total_time = 0;
-	/// @ignore
-	__display_time = "0";
-	/// @ignore
-	__suites = [];
-	/// @ignore
-	__logs = [];
-	/// @ignore
-	__discovered = undefined;
-	/// @ignore
-	__current_suite_index = 0;
-	/// @ignore
-	__is_running = false;
-	/// @ignore
-	__is_complete = false;
 
-	/// Run struct unpacker if unpack argument was provided
-	/// Stays after all variables are initialized so they may be overwritten
-	__crispy_validate_unpack_param(instanceof(self), "", _unpack);
+	/// @ignore
+	/// @desc Stop time of the runner
+	/// @type {Real}
+	__stop_time = 0;
+
+	/// @ignore
+	/// @desc Total time of the runner
+	/// @type {Real}
+	__total_time = 0;
+
+	/// @ignore
+	/// @desc Display time of the runner
+	/// @type {String}
+	__display_time = "0";
+
+	/// @ignore
+	/// @desc Array of test suites
+	/// @type {Array<Struct.CrispySuite>}
+	__suites = [];
+
+	/// @ignore
+	/// @desc Array of logs
+	/// @type {Array<Struct.CrispyLog>}
+	__logs = [];
+
+	/// @ignore
+	/// @desc Array of discovered scripts
+	/// @type {Array}
+	__discovered = undefined;
+
+	/// @ignore
+	/// @desc Index of the current suite being run
+	/// @type {Real}
+	__current_suite_index = 0;
+
+	/// @ignore
+	/// @desc Whether the runner is currently running
+	/// @type {Bool}
+	__is_running = false;
+
+	/// @ignore
+	/// @desc Whether the runner has completed its current run
+	/// @type {Bool}
+	__is_complete = false;
 
 	#region METHODS
 
-	/// @description Adds a Log to the array of logs
-	/// @param {Struct} log - Log struct to add to logs
+	/// @desc Adds a Log to the array of logs
+	/// @param {Struct.CrispyLog} log Log struct to add to logs
 	/// @returns {Struct.CrispyRunner} Self for chaining
 	static AddLog = function(_log)
 	{
@@ -39,19 +63,24 @@ function CrispyRunner(_name, _unpack = undefined) : CrispyTest(_name) constructo
 		return self;
 	}
 
-	/// @description Adds Logs to the array of logs
-	/// @param {Struct} input - Adds logs of the input to logs
+	/// @desc Adds Logs to the array of logs
+	/// @param {Struct.CrispyLog|Struct.CrispyRunner|Struct.CrispySuite} input Adds logs of the input to logs
+	/// @returns {Struct.CrispyRunner} Self for chaining
 	static CaptureLogs = function(_input)
 	{
-		var _i;
-		switch (instanceof(_input))
+		var i;
+		var _kind = "";
+		if (is_instanceof(_input, CrispyLog) ) _kind = "CrispyLog";
+		else if (is_instanceof(_input, CrispyCase) || is_instanceof(_input, CrispyCaseAsync) ) _kind = "CrispyCase";
+		else if (is_instanceof(_input, CrispySuite) ) _kind = "CrispySuite";
+
+		switch (_kind)
 		{
 			case "CrispyLog":
 				AddLog(_input);
 			break;
 
 			case "CrispyCase":
-			case "CrispyCaseAsync":
 				var _case_logs_len = array_length(_input.__logs);
 				var _case_pass = true;
 				var _case_msg = undefined;
@@ -59,32 +88,22 @@ function CrispyRunner(_name, _unpack = undefined) : CrispyTest(_name) constructo
 				var _failure_lines = [];
 				var _failure_index = 0;
 
-				_i = 0; repeat (_case_logs_len)
+				i = 0; repeat (_case_logs_len)
 				{
-					var _log = _input.__logs[_i];
+					var _log = _input.__logs[i];
 					if (!_log.__pass)
 					{
 						_case_pass = false;
 						++_failure_index;
 
-						var _line = "";
-						if (!is_undefined(_log.__msg) && _log.__msg != "")
-						{
-							_line = _log.__msg;
-						}
-						else if (!is_undefined(_log.__helper_text) && _log.__helper_text != "")
-						{
-							_line = _log.__helper_text;
-						}
-						else
-						{
-							_line = "Assertion failed.";
-						}
+						var _line = _log[$ "__msg"];
+						if (is_undefined(_line) || _line == "") { _line = _log[$ "__helper_text"]; }
+						if (is_undefined(_line) || _line == "") { _line = "Assertion failed."; }
 
 						array_push(_failure_lines, $"[{string(_failure_index)}] {_line}");
 					}
 
-					++_i;
+					++i;
 				}
 
 				if (!_case_pass)
@@ -92,48 +111,50 @@ function CrispyRunner(_name, _unpack = undefined) : CrispyTest(_name) constructo
 					_case_msg = $"{string(_failure_index)} assertion failure(s)";
 
 					var _details = "";
-					var _j = 0; repeat (array_length(_failure_lines))
+					var j = 0; repeat (array_length(_failure_lines))
 					{
-						if (_j > 0) _details += "\n";
-						_details += _failure_lines[_j];
-						++_j;
+						if (j > 0) _details += "\n";
+						_details += _failure_lines[j];
+						++j;
 					}
 
 					_case_helper_text = _details;
 				}
 
 				AddLog(new CrispyLog(_input, {
-					__pass: _case_pass,
-					__msg: _case_msg,
-					__helper_text: _case_helper_text,
-					__duration: _input.__duration,
-					__skipped: _input.__skipped,
+					__pass:	_case_pass,
+					__msg:	_case_msg,
+					__helper_text:	_case_helper_text,
+					__duration:		_input.__duration,
+					__skipped:		_input.__skipped,
 				}) );
 			break;
 			
 			case "CrispySuite":
-				var _k = 0; repeat (array_length(_input.__tests) )
+				i=0; repeat (array_length(_input.__tests) )
 				{
-					var _case = _input.__tests[_k];
+					var _case = _input.__tests[i];
 					CaptureLogs(_case);
-					++_k;
+					++i;
 				}
 			break;
 
 			default:
-				__crispy_error($"{instanceof(self)}.CaptureLogs() \"_input\" expected an instance of either CrispyLog, CrispyCase, or CrispySuite, received {__crispy_get_type_display(_input)}.");
+				__crispy_error($"CrispyRunner.CaptureLogs() '_input' expected an instance of either CrispyLog, CrispyCase, or CrispySuite, received {instanceof(_input)}.");
 			break;
 		}
+
+		return self;
 	}
 
-	/// @description Adds TestSuite to array of suites
+	/// @desc Adds TestSuite to array of suites
 	/// @param {Struct} test_suite - TestSuite to add
 	/// @returns {Struct.CrispyRunner} Self for chaining
 	static AddTestSuite = function(_test_suite)
 	{
-		if (instanceof(_test_suite) != "CrispySuite")
+		if (!is_instanceof(_test_suite, CrispySuite) )
 		{
-			__crispy_error($"{instanceof(self)}.AddTestSuite() \"_test_suite\" expected an instance of CrispySuite, received {__crispy_get_type_display(_test_suite)}.");
+			__crispy_error($"CrispyRunner.AddTestSuite() '_test_suite' expected an instance of CrispySuite, received {instanceof(_test_suite)}.");
 		}
 
 		_test_suite.__parent = self;
@@ -141,34 +162,31 @@ function CrispyRunner(_name, _unpack = undefined) : CrispyTest(_name) constructo
 		return self;
 	}
 
-	/// @description Creates a horizontal row string used to visually separate sections
-	/// @param {String} [str="-"] - String to concat n times
-	/// @param {Real} [count=70] - Number of times to concat str
+	/// @desc Creates a horizontal row string used to visually separate sections
+	/// @param {String} [str="-"] String to concat n times
+	/// @param {Real} [count=70] Number of times to concat str
 	/// @returns {String} String of horizontal row
 	static Hr = function(_str = "-", _count = 70)
 	{
-		if (!__crispy_validate_type_param(instanceof(self), "Hr", "_str", _str, "string")) return "";
-		if (!__crispy_validate_type_param(instanceof(self), "Hr", "_count", _count, "real")) return "";
-		
 		var _hr = ""; repeat(_count) { _hr += _str; }
 		return _hr;
 	}
 
-	/// @description Returns whether the runner is currently active.
+	/// @desc Returns whether the runner is currently active.
 	/// @returns {Bool}
 	static IsRunning = function()
 	{
 		return __is_running;
 	}
 
-	/// @description Returns whether the runner has completed its current run.
+	/// @desc Returns whether the runner has completed its current run.
 	/// @returns {Bool}
 	static IsComplete = function()
 	{
 		return __is_complete;
 	}
 	
-	/// @description Runs test suites and logs results
+	/// @desc Runs test suites and logs results
 	/// @returns {Struct.CrispyRunner} Self for chaining
 	static Run = function()
 	{
@@ -181,109 +199,53 @@ function CrispyRunner(_name, _unpack = undefined) : CrispyTest(_name) constructo
 		return self;
 	}
 
-	/// @description Updates the active suite and advances the run when async suites complete.
+	/// @desc Updates the active suite and advances the run when async suites complete.
 	/// @returns {Struct.CrispyRunner} Self for chaining
 	static Update = function()
 	{
-		if (!__is_running)
-		{
-			return self;
-		}
-
+		if (!__is_running) return self;
 		__AdvanceSuites();
 
 		return self;
 	}
 
-	/// @description Clears logs, starts timer, and runs __SetUp
-	/// @param {Function} [func] - Method to override __SetUp with
+	/// @desc Clears logs, starts timer, and runs __SetUp
+	/// @param {Function} [callback] Callback to override __SetUp with
 	/// @returns {Struct.CrispyRunner} Self for chaining
 	static SetUp = function(_func)
 	{
-		if (!is_undefined(_func))
-		{
-			if (is_method(_func))
-			{
-				__SetUp = method(self, _func);
-			}
-			else
-			{
-				__crispy_error($"{instanceof(self)}.SetUp() \"_func\" expected a function, received {typeof(_func)}.");
-			}
-		}
-		else
+		if (is_undefined(_func) )
 		{
 			__logs = [];
 			__start_time = get_timer();
 			__is_complete = false;
-			if (is_method(__SetUp)) { __SetUp(); }
-		}
 
-		return self;
-	}
-
-	/// @ignore
-	static __AdvanceSuites = function()
-	{
-		var _len = array_length(__suites);
-		while (__current_suite_index < _len)
-		{
-			var _suite = __suites[__current_suite_index];
-
-			if (!_suite.IsRunning() && !_suite.IsComplete())
-			{
-				OnRunBegin();
-				_suite.Run();
-			}
-			else if (_suite.IsRunning())
-			{
-				_suite.Update();
-			}
-
-			if (_suite.IsComplete())
-			{
-				CaptureLogs(_suite);
-				OnRunEnd();
-				++__current_suite_index;
-				continue;
-			}
-
-			return self;
-		}
-
-		if (__is_running)
-		{
-			__is_running = false;
-			__is_complete = true;
-			TearDown();
-		}
-
-		return self;
-	}
-
-	/// @description Function ran after test, used to clean up test
-	/// @param {Function} [func] - Method to override __TearDown with
-	/// @returns {Struct.CrispyRunner} Self for chaining
-	static TearDown = function(_func)
-	{
-		if (!is_undefined(_func))
-		{
-			if (is_method(_func))
-			{
-				__TearDown = method(self, _func);
-			}
-			else
-			{
-				__crispy_error($"{instanceof(self)}.TearDown() \"_func\" expected a function, received {typeof(_func)}.");
-			}
+			if (is_callable(__SetUp) ) __SetUp();
 		}
 		else
 		{
-			if (CRISPY_DEBUG && CRISPY_SILENCE_PASSING_TESTS_OUTPUT)
+			__SetUp = method(self, _func);
+		}
+
+		return self;
+	}
+
+	/// @desc Callback run after the test to clean up its state
+	/// @param {Function} [callback] Callback to override __TearDown with
+	/// @returns {Struct.CrispyRunner} Self for chaining
+	static TearDown = function(_func)
+	{
+		if (!is_undefined(_func) )
+		{
+			__TearDown = method(self, _func);
+		}
+		else
+		{
+			if (CRISPY_SILENCE_PASSING_TESTS_OUTPUT)
 			{
 				__crispy_alert("Passing test messages are silenced.");
 			}
-
+			
 			// Get total run time
 			__stop_time = get_timer();
 			__total_time = __stop_time - __start_time;
@@ -299,9 +261,9 @@ function CrispyRunner(_name, _unpack = undefined) : CrispyTest(_name) constructo
 			{
 				var _row_len = abs(CRISPY_STATUS_OUTPUT_LENGTH);
 				var _row = "";
-				for (var _i = 0; _i < _len; ++_i)
+				for (var i = 0; i < _len; ++i)
 				{
-					if (__logs[_i].__pass)
+					if (__logs[i].__pass)
 					{
 						++_passed_tests;
 						_row += CRISPY_PASS_MSG_SILENT;
@@ -312,7 +274,7 @@ function CrispyRunner(_name, _unpack = undefined) : CrispyTest(_name) constructo
 					}
 					++_j;
 
-					if (_row_len > 0 && _j == _row_len && _i != _len - 1)
+					if (_row_len > 0 && _j == _row_len && i != _len - 1)
 					{
 						_t += _row + "\n";
 						_row = "";
@@ -321,6 +283,14 @@ function CrispyRunner(_name, _unpack = undefined) : CrispyTest(_name) constructo
 				}
 				_t += _row;
 			}
+			else
+			{
+				var _index = 0; repeat (_len)
+				{
+					if (__logs[_index].__pass) { ++_passed_tests; }
+					++_index;
+				}
+			}
 
 			Output(_t);
 
@@ -328,17 +298,17 @@ function CrispyRunner(_name, _unpack = undefined) : CrispyTest(_name) constructo
 			Output(Hr() );
 			
 			// Show individual log messages
-			var _i = 0; repeat (_len)
+			var i = 0; repeat (_len)
 			{
 				// _passed_tests already counted in status output loop above
 
-				if (!CRISPY_SILENCE_PASSING_TESTS_OUTPUT || !__logs[_i].__pass)
+				if (!CRISPY_SILENCE_PASSING_TESTS_OUTPUT || !__logs[i].__pass)
 				{
-					var _msg = __logs[_i].GetMsg();
+					var _msg = __logs[i].GetMsg();
 					if (_msg != "") { Output(_msg); }
 				}
 
-				++_i;
+				++i;
 			}
 
 			// Finish by showing entire time it took to run the tests
@@ -362,75 +332,73 @@ function CrispyRunner(_name, _unpack = undefined) : CrispyTest(_name) constructo
 		return self;
 	}
 
-	/// @description Function for discovering individual test functions within scripts, and adds them to a TestSuite
-	/// @param {Struct} [test_suite=undefined] - TestSuite to add discovered test script to, else create a temporary TestSuite
-	/// @param {String} [script_start_pattern="test_"] - String that script functions need to start with in order to be discoverable
+	/// @desc Function for discovering individual test functions within scripts, and adds them to a TestSuite
+	/// @param {Struct.CrispySuite} [test_suite=undefined] TestSuite to add discovered test script to, else create a temporary TestSuite
+	/// @param {String} [script_start_pattern="test_"] String that script functions need to start with in order to be discoverable
 	/// @returns {Struct.CrispyRunner} Self for chaining
 	static Discover = function(_test_suite, _script_start_pattern = "test_")
 	{
-		if (!is_string(_script_start_pattern))
+		if (!is_string(_script_start_pattern) )
 		{
-			__crispy_error($"{instanceof(self)}.Discover() \"_script_start_pattern\" expected a string, received {typeof(_script_start_pattern)}.");
+			__crispy_error($"CrispyRunner.Discover() '_script_start_pattern' expected a string, received {typeof(_script_start_pattern)}.");
 		}
 
 		// Cache all script functions
-		if (is_undefined(__discovered))
+		if (is_undefined(__discovered) )
 		{
 			__discovered = [];
-			var _i = 100000; // Range of custom scripts is 100000 onwards
+			// Range of custom scripts is 100000 onwards
 			var _missing_streak = 0;
 			var _max_missing_streak = 2048;
 
 			// Script IDs can contain gaps, so keep scanning until enough consecutive misses suggest the range ended.
-			while (_missing_streak < _max_missing_streak)
+			var i = 100000; while (_missing_streak < _max_missing_streak)
 			{
-				if (!script_exists(_i) )
+				if (!script_exists(i) )
 				{
 					++_missing_streak;
-					++_i;
+					++i;
 					continue;
 				}
 
 				_missing_streak = 0;
 				
-				var _script_name = script_get_name(_i);
+				var _script_name = script_get_name(i);
 				// Skip adding functions that are not named script functions
 				if (string_count("_gml_Object_", _script_name) != 0 || string_count("_gml_GlobalScript_", _script_name) != 0)
 				{
-					++_i;
+					++i;
 					continue;
 				}
 
 				array_push(__discovered, {
 					name: _script_name,
-					func: _i,
+					func: i,
 					discovered: false
 				});
 				
-				if (CRISPY_DEBUG) { __crispy_alert($"Discovered script function: {_script_name} ({string(_i)})."); }
-				++_i;
+				__crispy_alert($"Discovered script function: {_script_name} ({i}).");
+				++i;
 			}
-
-			if (CRISPY_DEBUG)
-			{
-				__crispy_alert($"Stopped discovery scan after {_max_missing_streak} consecutive missing script IDs.");
-			}
+			
+			__crispy_alert($"Stopped discovery scan after {_max_missing_streak} consecutive missing script IDs.");
 		}
 
 		var _created_test_suite = is_undefined(_test_suite);
 
 		// If value is passed for _test_suite
-		if (!is_undefined(_test_suite))
+		if (!is_undefined(_test_suite) )
 		{
-			if (instanceof(_test_suite) != "CrispySuite")
+			if (!is_instanceof(_test_suite, CrispySuite) )
 			{
-				var _type = !is_undefined(instanceof(_test_suite)) ? instanceof(_test_suite) : typeof(_test_suite);
-				__crispy_error($"{instanceof(self)}.Discover() \"_test_suite\" expected an instance of CrispySuite, received {_type}.");
+				var _instanceof = instanceof(_test_suite);
+				var _type = !is_undefined(_instanceof) ? _instanceof : typeof(_test_suite);
+				__crispy_error($"CrispyRunner.Discover() '_test_suite' expected an instance of CrispySuite, received {_type}.");
 			}
 			// Throw error if test_suite was not previously added to test_runner
 			if (_test_suite.__parent != self)
 			{
-				__crispy_error($"{instanceof(self)}.Discover() \"_test_suite\" parent is not self.\nProvided CrispySuite may not have been added to {__name} prior to running Discover.");
+				__crispy_error($"CrispyRunner.Discover() '_test_suite' parent is not self.\nProvided CrispySuite may not have been added to {__name} prior to running Discover.");
 			}
 		}
 		else
@@ -442,14 +410,14 @@ function CrispyRunner(_name, _unpack = undefined) : CrispyTest(_name) constructo
 		var _pattern_len = string_length(_script_start_pattern);
 		if (_pattern_len == 0)
 		{
-			show_error($"{instanceof(self)}.Discover() \"_script_start_pattern\" cannot be an empty string.", true);
+			__crispy_error($"CrispyRunner.Discover() '_script_start_pattern' cannot be an empty string.");
 		}
 		
 		// Discover scripts matching the start pattern and add as test cases
 		var _len = array_length(__discovered);
-		for (var _i = 0; _i < _len; ++_i)
+		for (var i = 0; i < _len; ++i)
 		{
-			var _script = __discovered[_i];
+			var _script = __discovered[i];
 			if (_script.discovered) continue;
 
 			var _script_name = _script.name;
@@ -471,25 +439,25 @@ function CrispyRunner(_name, _unpack = undefined) : CrispyTest(_name) constructo
 			if (array_length(_test_suite.__tests) == 0)
 			{
 				delete _test_suite;
-				if (CRISPY_DEBUG) { __crispy_alert($"{__name}.Discover() local CrispySuite deleted."); }
+				__crispy_alert($"{__name}.Discover() local CrispySuite deleted.");
 			}
 			else
 			{
 				AddTestSuite(_test_suite);
-				if (CRISPY_DEBUG) { __crispy_alert($"{__name}.Discover() local CrispySuite added: {_test_suite.__name}"); }
+				__crispy_alert($"{__name}.Discover() local CrispySuite added: {_test_suite.__name}");
 			}
 		}
 
 		return self;
 	}
 
-	/// @description Pass input to __Output if string. Overwrite __Output if function
-	/// @param {String|Function} input - String to output or function to overwrite __Output
+	/// @desc Writes a string or replaces the output callback.
+	/// @param {String|Function} input String to output or callback to replace __Output
 	static Output = function(_input)
 	{
-		if (is_undefined(_input))
+		if (is_undefined(_input) )
 		{
-			__crispy_error($"{instanceof(self)}.Output() expected 1 argument, received 0 argument(s).");
+			__crispy_error($"CrispyRunner.Output() expected 1 argument, received 0 argument(s).");
 			return;
 		}
 
@@ -504,16 +472,61 @@ function CrispyRunner(_name, _unpack = undefined) : CrispyTest(_name) constructo
 		}
 		else
 		{
-			__crispy_error($"{instanceof(self)}.Output() \"_input\" expected either a string or method, received {_type}.");
+			__crispy_error($"CrispyRunner.Output() '_input' expected either a string or method, received {_type}.");
 		}
+
+		return self;
 	}
 
-	/// @description Function that gets called on output. This function can be overwritten by a function passed into the Output() function
-	/// @param {String} message - By default, prints string to Output Console
 	/// @ignore
+	/// @desc Function that gets called on output. This function can be overwritten by a function passed into the Output() function
+	/// @param {String} message By default, prints string to Output Console
 	static __Output = function(_message)
 	{
 		show_debug_message(_message);
+	}
+
+	/// @ignore
+	/// @desc Advances the runner through the test suites, running and updating them as needed.
+	/// @returns {Struct.CrispyRunner} Self for chaining
+	static __AdvanceSuites = function()
+	{
+		var _len = array_length(__suites);
+		while (__current_suite_index < _len)
+		{
+			var _suite = __suites[__current_suite_index];
+
+			if (!_suite.IsRunning() && !_suite.IsComplete() )
+			{
+				OnRunBegin();
+				_suite.Run();
+			}
+			else if (_suite.IsRunning() )
+			{
+				_suite.Update();
+			}
+
+			if (_suite.IsComplete() )
+			{
+				CaptureLogs(_suite);
+				OnRunEnd();
+				++__current_suite_index;
+
+				continue;
+			}
+
+			return self;
+		}
+
+		if (__is_running)
+		{
+			__is_running = false;
+			__is_complete = true;
+
+			TearDown();
+		}
+
+		return self;
 	}
 
 	/// @returns {String}

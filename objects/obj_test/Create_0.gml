@@ -77,7 +77,7 @@ can_run_tests = true;
 
 // Setting up text for Crispy info and controls
 padding = 10;
-info_text = CRISPY_NAME + " " + CRISPY_VERSION + "    " + CRISPY_DATE + "\n\n";
+info_text = "Crispy " + CRISPY_VERSION + "\n\n";
 info_text += "Test results are displayed below and in the Output Window.\n";
 info_text += "Press \"R\" to re-run tests." + "\n";
 info_text += "Press \"C\" to clear test results." + "\n";

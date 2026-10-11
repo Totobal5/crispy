@@ -1,101 +1,120 @@
-/// @description Base constructor that test constructors will inherit from
-/// @param {String} name - Name of class
+/// @desc Base constructor for Crispy test containers.
+/// @param {String} name Name of class
 function CrispyTest(_name) constructor
 {
-	/// Shared static struct accessible across all Crispy constructors (Runner, Suite, Case)
-	/// Use this to store variables that need to be accessed across test hierarchy
-	/// Example: In Suite.SetUp(), set vars.hamburger = new Food(); then access in tests via parent.hamburger
+	/// @desc Shared variables accessible from every Crispy test container.
+	/// @type {Struct}
 	/// @ignore
 	static vars = {};
 
 	/// @ignore
-	__name = undefined;
-
-	static SetUp = undefined;
-	static TearDown = undefined;
-
-	/// @ignore
-	static __SetUp = undefined;
-	/// @ignore
-	static __TearDown = undefined;
-	/// @ignore
-	static __OnRunBegin = undefined;
-	/// @ignore
-	static __OnRunEnd = undefined;
+	/// @desc Name of class
+	/// @type {String}
+	__name = _name;
 
 	/// @ignore
-	__struct_unpack = method(self, __crispy_struct_unpack);
-	__SetName(_name);
+	/// @desc Callback to execute in the setup.
+	/// @type {Function|Undefined}
+	__SetUp = undefined;
 
+	/// @ignore
+	/// @desc Callback to execute in the teardown.
+	/// @type {Function|Undefined}
+	__TearDown = undefined;
+
+	/// @ignore
+	/// @desc Callback to execute at the beginning of run.
+	/// @type {Function|Undefined}
+	__OnRunBegin = undefined;
+
+	/// @ignore
+	/// @desc Callback to execute at the end of run.
+	/// @type {Function|Undefined}
+	__OnRunEnd = undefined;
 
 	#region METHODS
 
-	/// @ignore
-	/// @description Set name of class object
-	/// @param {String} name - Name of the object
-	static __SetName = function(_name)
-	{
-		if (!is_string(_name))
-		{
-			__crispy_error($"{instanceof(self)}.__SetName() \"name\" expected a string, received {typeof(_name)}.");
-		}
-		__name = _name;
-	}
-
-	/// @description Get the name of this test
+	/// @desc Get the name of this test
 	/// @returns {String} Name of the test
 	static GetName = function()
 	{
 		return __name;
 	}
-	
-	/// @description Event to be called at the beginning of run
-	/// @param {Function} [func] - Method to override __OnRunBegin with
-	static OnRunBegin = function(_func)
+
+	/// @desc Configures or runs the setup callback.
+	/// @param {Function|Undefined} callback Callback to run before a test.
+	/// @returns {Struct.CrispyTest} Self for chaining.
+	static SetUp = function(_callback = undefined)
 	{
-		if (is_undefined(_func))
+		if (is_callable(_callback) )
 		{
-			if (is_method(__OnRunBegin))
-			{
-				__OnRunBegin();
-			}
+			__SetUp = method(self, _callback);
 		}
 		else
 		{
-			if (is_method(_func))
-			{
-				__OnRunBegin = method(self, _func);
-			}
-			else
-			{
-				__crispy_error($"{instanceof(self)}.OnRunBegin() \"func\" expected a function, received {typeof(_func)}.");
-			}
+			if (is_callable(__SetUp) ) { __SetUp(); }
 		}
+
+		return self;
 	}
 
-	/// @description Event to be called at the end of run
-	/// @param {Function} [func] - Method to override __OnRunEnd with
-	static OnRunEnd = function(_func)
+	/// @desc Configures or runs the teardown callback.
+	/// @param {Function|Undefined} callback Callback to run after a test.
+	/// @returns {Struct.CrispyTest} Self for chaining.
+	static TearDown = function(_callback = undefined)
 	{
-		if (is_undefined(_func))
+		if (is_callable(_callback) )
 		{
-			if (is_method(__OnRunEnd))
-			{
-				__OnRunEnd();
-			}
+			__TearDown = method(self, _callback);
 		}
 		else
 		{
-			if (is_method(_func))
-			{
-				__OnRunEnd = method(self, _func);
-			}
-			else
-			{
-				__crispy_error($"{instanceof(self)}.OnRunEnd() \"func\" expected a function, received {typeof(_func)}.");
-			}
+			if (is_callable(__TearDown) ) { __TearDown(); }
 		}
+
+		return self;
+	}
+	
+	/// @desc Configures or runs the callback at the start of a run.
+	/// @param {Function|Undefined} callback Callback to run at the start of a test.
+	/// @returns {Struct.CrispyTest} Self for chaining.
+	static OnRunBegin = function(_callback = undefined)
+	{
+		if (is_callable(_callback) )
+		{
+			__OnRunBegin = method(self, _callback);
+		}
+		else
+		{
+			if (is_callable(__OnRunBegin) ) { __OnRunBegin(); }
+		}
+
+		return self;
+	}
+
+	/// @desc Configures or runs the callback at the end of a run.
+	/// @param {Function|Undefined} callback Callback to run at the end of a test.
+	/// @returns {Struct.CrispyTest} Self for chaining.
+	static OnRunEnd = function(_callback = undefined)
+	{
+		if (is_callable(_callback) )
+		{
+			__OnRunEnd = method(self, _callback);
+		}
+		else
+		{
+			if (is_callable(__OnRunEnd) ) { __OnRunEnd(); }
+		}
+
+		return self;
 	}
 
 	#endregion
+}
+script_execute(CrispyTest);
+
+// See crispy variables in Debug Mode.
+if (debug_mode)
+{
+	global.__crispy_vars = static_get(CrispyTest).vars;
 }

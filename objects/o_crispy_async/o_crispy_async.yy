@@ -11,8 +11,8 @@
   "name":"o_crispy_async",
   "overriddenProperties":[],
   "parent":{
-    "name":"Crispy",
-    "path":"folders/Crispy.yy",
+    "name":"Objects",
+    "path":"folders/Objects.yy",
   },
   "parentObjectId":null,
   "persistent":true,

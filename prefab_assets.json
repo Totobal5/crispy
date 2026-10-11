@@ -1,0 +1,53 @@
+{
+  "Version": "1.0",
+  "assets": [
+    {
+      "export": 2,
+      "name": "o_crispy_async"
+    },
+    {
+      "export": 2,
+      "name": "crispy_Case"
+    },
+    {
+      "export": 2,
+      "name": "Crispy_Case_Async"
+    },
+    {
+      "export": 2,
+      "name": "crispy_Config"
+    },
+    {
+      "export": 2,
+      "name": "crispy_Functions"
+    },
+    {
+      "export": 2,
+      "name": "crispy_Log"
+    },
+    {
+      "export": 2,
+      "name": "crispy_Runner"
+    },
+    {
+      "export": 2,
+      "name": "crispy_Self_Test"
+    },
+    {
+      "export": 2,
+      "name": "crispy_Suite"
+    },
+    {
+      "export": 2,
+      "name": "crispy_Test"
+    },
+    {
+      "export": 2,
+      "name": "crispy_Docs"
+    },
+    {
+      "export": 2,
+      "name": "crispy_License"
+    }
+  ]
+}

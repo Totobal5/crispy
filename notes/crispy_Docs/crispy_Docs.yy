@@ -1,0 +1,13 @@
+{
+  "$GMNotes":"v2",
+  "%Name":"crispy_Docs",
+  "name":"crispy_Docs",
+  "openedOnFirstLoad":true,
+  "parent":{
+    "name":"crispy",
+    "path":"crispy.yyp",
+  },
+  "resourceType":"GMNotes",
+  "resourceVersion":"2.0",
+  "shouldOpenOnLoad":true,
+}

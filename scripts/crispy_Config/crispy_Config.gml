@@ -1,46 +1,43 @@
+#export CRISPY_RUN, CRISPY_LOG_ALERTS, CRISPY_LOG_ERRORS, CRISPY_FATAL_ERRORS, CRISPY_VERBOSITY, CRISPY_TIME_PRECISION, CRISPY_PASS_MSG_SILENT, CRISPY_FAIL_MSG_SILENT, CRISPY_PASS_MSG_VERBOSE, CRISPY_FAIL_MSG_VERBOSE, CRISPY_STATUS_OUTPUT_LENGTH, CRISPY_SILENCE_PASSING_TESTS_OUTPUT
+#export crispy_vars, CrispyTest, CrispyCase, CrispyCaseAsync, CrispySuite, CrispyRunner, CrispyLog
+
 /// @ignore [MAJOR.MINOR.PATH]
-#macro CRISPY_VERSION   "2.2.4"
-/// @ignore
-#macro CRISPY_NAME      "Crispy"
-/// @ignore
-#macro CRISPY_AUTHOR    "Brent Frymire"
-/// @ignore
-#macro CRISPY_REPO      "https://github.com/bfrymire/crispy"
-/// @ignore yyyy-mm-dd
-#macro CRISPY_DATE      "2026-05-03"
+#macro CRISPY_VERSION	"2.0.0"
 
 /// @ignore Boolean flag that can be used to automatically run tests
-#macro CRISPY_RUN           true
-/// @ignore Enables outputting extra context on some silent functions
-#macro CRISPY_DEBUG         false
-/// @ignore Determines how verbose assertion outputs will be. Acceptable values are 0, 1, or 2
-#macro CRISPY_VERBOSITY     2
-/// @ignore Enables strict mode. This will make the game close immediately with an error if the framework encounters an unexpected value or type, which can be useful for debugging
-#macro CRISPY_STRICT_MODE   false
+#macro CRISPY_RUN			true
 
-/// @ignore Number of decimal places to round to when outputting time values
-#macro CRISPY_TIME_PRECISION 6 
+/// @ignore Write library alerts to the debug output. (Default: true)
+#macro CRISPY_LOG_ALERTS	false
 
-/// @ignore Output string when an assertion passes silently
-#macro CRISPY_PASS_MSG_SILENT   "."
-/// @ignore Output string when an assertion fails silently
-#macro CRISPY_FAIL_MSG_SILENT   "F"
+/// @ignore Write internal library errors to the debug output. (Default: true)
+#macro CRISPY_LOG_ERRORS	false
 
-/// @ignore Output string when an assertion passes verbosely
-#macro CRISPY_PASS_MSG_VERBOSE  "Ok"
-/// @ignore Output string when an assertion fails verbosely
-#macro CRISPY_FAIL_MSG_VERBOSE  "Fail"
+/// @ignore Make internal library errors fatal. (Default: true)
+#macro CRISPY_FATAL_ERRORS	true
 
-/// @ignore Number of characters per line when outputting CrispyCase statuses
-#macro CRISPY_STATUS_OUTPUT_LENGTH 150
+/// @ignore Determines how verbose assertion outputs will be. Acceptable values are 0, 1, or 2 (Default: 2)
+#macro CRISPY_VERBOSITY		2
 
-/// @ignore Enables silencing passing test messages
-#macro CRISPY_SILENCE_PASSING_TESTS_OUTPUT false
+/// @ignore Number of decimal places to round to when outputting time values (Default: 6)
+#macro CRISPY_TIME_PRECISION	6 
 
-/// @ignore Enables dunder variables to be overwritten when using `__crispy_struct_unpack`
-#macro CRISPY_STRUCT_UNPACK_ALLOW_DUNDER false
+/// @ignore Output string when an assertion passes silently (Default: ".")
+#macro CRISPY_PASS_MSG_SILENT	"."
 
+/// @ignore Output string when an assertion fails silently (Default: "F")
+#macro CRISPY_FAIL_MSG_SILENT	"F"
 
-show_debug_message("Using " + CRISPY_NAME + " unit testing framework by " + CRISPY_AUTHOR + ". This is version " + CRISPY_VERSION + ", released on " + CRISPY_DATE + ".");
+/// @ignore Output string when an assertion passes verbosely (Default: "Ok")
+#macro CRISPY_PASS_MSG_VERBOSE	"Ok"
 
-global.__crispy_global = self;
+/// @ignore Output string when an assertion fails verbosely (Default: "Fail")
+#macro CRISPY_FAIL_MSG_VERBOSE	"Fail"
+
+/// @ignore Number of characters per line when outputting CrispyCase statuses (Default: 150)
+#macro CRISPY_STATUS_OUTPUT_LENGTH	150
+
+/// @ignore Enables silencing passing test messages in the Output Window. (Default: false)
+#macro CRISPY_SILENCE_PASSING_TESTS_OUTPUT	false
+
+__crispy_alert($"Using Crispy unit testing framework by Brent Frymire and Toto (C.A).");
