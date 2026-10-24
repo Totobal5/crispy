@@ -1,29 +1,30 @@
-// Draw results GUI box background
-results_box.draw(colors.background, false);
+/// @desc Draws the report overlay of the demo runner.
 
-// Draw test results
-var _h_total = 0;
+// Results panel.
+results_box.Draw(colors.background, false);
+
 var _len = ds_list_size(results);
-if _len 
+
+if (_len != 0)
 {
 	draw_set_color(colors.foreground);
+
 	var i = 0;
-	repeat (_len) 
+	repeat (_len)
 	{
 		var _text = results[| i];
-		var _h = (i + 1) * text_height;
-		draw_text(results_box.x1 + padding, results_box.y2 - padding - scroll_position - _h, _text);
-		
+		var _offset = (i + 1) * text_height;
+		draw_text(results_box.GetX1() + padding, results_box.GetY2() - padding - scroll_position - _offset, _text);
+
 		++i;
 	}
 }
 
-// Draw results GUI box outline
-results_box.draw(colors.foreground, true);
+results_box.Draw(colors.foreground, true);
 
-// Draw Crispy version and instructions
-info_box.draw(colors.background, false);
-info_box.draw(colors.foreground, true);
+// Info panel.
+info_box.Draw(colors.background, false);
+info_box.Draw(colors.foreground, true);
 draw_set_color(colors.purple);
 draw_text(padding, padding, info_text);
 draw_set_color(c_black);

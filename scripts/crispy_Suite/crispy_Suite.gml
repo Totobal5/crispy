@@ -1,156 +1,181 @@
 /// @desc Creates a suite that groups related test cases.
-/// @param {String} name Name of suite
-/// @returns {Struct.CrispySuite} New suite.
-function CrispySuite(_name) : CrispyTest(_name) constructor 
+/// @param {String} name Name of the suite.
+function CrispySuite(_name) : CrispyTest(_name) constructor
 {
-	/// @ignore
-	/// @desc Parent suite of this suite
-	/// @type {Struct.CrispySuite}
-	__parent = undefined;
+	#region PRIVATE
 
-	/// @ignore
-	/// @desc Array of tests in the suite
-	/// @type {Array}
-	__tests = [];
+		#region FIELDS
 
-	/// @ignore
-	/// @desc Whether the suite is currently running
-	/// @type {Bool}
-	__is_running = false;
+		/// @ignore
+		/// @type {Struct.CrispySuite|Struct.CrispyRunner|Undefined}
+		/// @desc Runner that owns this suite.
+		__parent = undefined;
 
-	/// @ignore
-	/// @desc Whether the suite has completed
-	/// @type {Bool}
-	__is_complete = false;
-	
-	#region METHODS
+		/// @ignore
+		/// @type {Array<Struct.CrispyCase|Struct.CrispyCaseAsync>}
+		/// @desc Test cases registered in the suite.
+		__tests = [];
 
-	/// @desc Adds CrispyCase to array of cases
-	/// @param {Struct} test_case CrispyCase to add
-	/// @returns {Struct.CrispySuite} Self for chaining
-	static AddCase = function(_test_case)
-	{
-		var _is_case = is_instanceof(_test_case, CrispyCase) || is_instanceof(_test_case, CrispyCaseAsync);
-		if (!_is_case)
-		{
-			var _instanceof = instanceof(_test_case);
-			var _type = !is_undefined(_instanceof) ? _instanceof : typeof(_test_case);
-			__crispy_error($"CrispySuite.AddCase() '_test_case' expected an instance of CrispyCase or CrispyCaseAsync, received {_type}.");
-		}
-		
-		_test_case.__parent = self;
-		array_push(__tests, _test_case);
-		
-		return self;
-	}
+		/// @ignore
+		/// @type {Bool}
+		/// @desc Whether the suite is currently running.
+		__is_running = false;
 
-	/// @desc Returns whether the suite is currently running.
-	/// @returns {Bool}
-	static IsRunning = function()
-	{
-		return __is_running;
-	}
-
-	/// @desc Returns whether the suite has completed.
-	/// @returns {Bool}
-	static IsComplete = function()
-	{
-		return __is_complete;
-	}
-	
-	/// @desc Runs tests
-	/// @returns {Struct.CrispySuite} Self for chaining
-	static Run = function()
-	{
+		/// @ignore
+		/// @type {Bool}
+		/// @desc Whether the suite has completed.
 		__is_complete = false;
-		__is_running = true;
-		SetUp();
 
-		var _has_async_running = false;
-		var i = 0; repeat(array_length(__tests) )
+		#endregion
+
+		#region METHODS
+
+		/// @ignore
+		/// @desc Finalizes the suite once every test has completed.
+		/// @return {Struct.CrispySuite} this instance
+		static __FinalizeRun = function()
 		{
-			var _test = __tests[i++];
-			OnRunBegin();
+			if (__is_complete) return self;
 
-			if (is_instanceof(_test, CrispyCaseAsync) )
+			TearDown();
+			__is_running = false;
+			__is_complete = true;
+
+			return self;
+		}
+
+		#endregion
+
+	#endregion
+
+	#region PUBLIC
+
+		#region METHODS
+
+		/// @desc Adds a test case to the suite.
+		/// @param {Struct.CrispyCase|Struct.CrispyCaseAsync} test_case Case to add.
+		/// @return {Struct.CrispySuite} this instance
+		static AddCase = function(_test_case)
+		{
+			if (!is_instanceof(_test_case, CrispyCase) && !is_instanceof(_test_case, CrispyCaseAsync) )
 			{
-				_test.__suite_on_run_end_pending = true;
-				_test.Start();
+				__crispy_error(
+					"CrispySuite.AddCase() 'test_case' expected an instance of CrispyCase or "
+					+ $"CrispyCaseAsync, received {__crispy_type(_test_case)}."
+				);
+				return self;
+			}
 
-				if (_test.IsComplete() )
+			_test_case.__parent = self;
+			array_push(__tests, _test_case);
+
+			return self;
+		}
+
+		/// @desc Runs every test in the suite.
+		/// @return {Struct.CrispySuite} this instance
+		static Run = function()
+		{
+			__is_complete = false;
+			__is_running = true;
+			SetUp();
+
+			var _has_async_running = false;
+
+			var i = 0;
+			repeat (array_length(__tests) )
+			{
+				var _test = __tests[i++];
+				OnRunBegin();
+
+				if (is_instanceof(_test, CrispyCaseAsync) )
 				{
-					if (_test.__suite_on_run_end_pending)
+					_test.__suite_on_run_end_pending = true;
+					_test.Start();
+
+					if (_test.IsComplete() )
 					{
-						OnRunEnd();
-						_test.__suite_on_run_end_pending = false;
+						if (_test.__suite_on_run_end_pending)
+						{
+							OnRunEnd();
+							_test.__suite_on_run_end_pending = false;
+						}
+					}
+					else
+					{
+						_has_async_running = true;
 					}
 				}
 				else
 				{
-					_has_async_running = true;
+					_test.Run();
+					OnRunEnd();
 				}
 			}
-			else
-			{
-				_test.Run();
-				OnRunEnd();
-			}
+
+			if (!_has_async_running) __FinalizeRun();
+
+			return self;
 		}
 
-		if (!_has_async_running) { __FinalizeRun(); }
-		
-		return self;
-	}
-
-	/// @desc Updates asynchronous tests and finalizes the suite when they complete.
-	/// @returns {Struct.CrispySuite} Self for chaining
-	static Update = function()
-	{
-		if (!__is_running) { return self; }
-
-		var _has_async_running = false;
-		var _i = 0; repeat(array_length(__tests) )
+		/// @desc Updates the asynchronous tests and finalizes the suite once they complete.
+		/// @return {Struct.CrispySuite} this instance
+		static Update = function()
 		{
-			var _test = __tests[_i++];
-			if (!is_instanceof(_test, CrispyCaseAsync) ) continue;
+			if (!__is_running) return self;
 
-			if (_test.IsRunning() )
+			var _has_async_running = false;
+
+			var i = 0;
+			repeat (array_length(__tests) )
 			{
-				_has_async_running = true;
-				continue;
+				var _test = __tests[i++];
+				if (!is_instanceof(_test, CrispyCaseAsync) ) continue;
+
+				if (_test.IsRunning() )
+				{
+					_has_async_running = true;
+					continue;
+				}
+
+				if (_test.__suite_on_run_end_pending && _test.IsComplete() )
+				{
+					OnRunEnd();
+					_test.__suite_on_run_end_pending = false;
+				}
 			}
 
-			if (_test.__suite_on_run_end_pending && _test.IsComplete())
-			{
-				OnRunEnd();
-				_test.__suite_on_run_end_pending = false;
-			}
+			if (!_has_async_running) __FinalizeRun();
+
+			return self;
 		}
 
-		if (!_has_async_running) { __FinalizeRun(); }
+		/// @desc Converts the suite into a short debug representation.
+		/// @return {String} Debug representation of the suite.
+		static toString = function()
+		{
+			return $"<Crispy Suite('{__name}')>";
+		}
 
-		return self;
-	}
+		#endregion
 
-	/// @ignore
-	/// @desc Finalizes the suite when all tests have completed.
-	/// @returns {Struct.CrispySuite} Self for chaining
-	static __FinalizeRun = function()
-	{
-		if (__is_complete) { return self; }
+		#region STATE QUERIES
 
-		TearDown();
-		__is_running = false;
-		__is_complete = true;
+		/// @desc Returns whether the suite is currently running.
+		/// @return {Bool} Whether the suite is running.
+		static IsRunning = function()
+		{
+			return __is_running;
+		}
 
-		return self;
-	}
+		/// @desc Returns whether the suite has completed.
+		/// @return {Bool} Whether the suite is complete.
+		static IsComplete = function()
+		{
+			return __is_complete;
+		}
 
-	/// @returns {String}
-	static toString = function()
-	{
-		return $"<Crispy Suite('{__name}')>";
-	}
+		#endregion
 
 	#endregion
 }
