@@ -20,7 +20,7 @@
     {"$GMFolder":"","%Name":"GUI","folderPath":"folders/Unit Tests/Scripts/GUI.yy","name":"GUI","resourceType":"GMFolder","resourceVersion":"2.0",},
   ],
   "ForcedPrefabProjectReferences":[
-    {"link":"com.toto.ytrace-1.0.0","name":"com.toto.ytrace-1.0.0","path":"com.toto.ytrace-1.0.0.yyp",},
+    {"link":"cyou.tobalsea.ytrace-1.0.1","name":"cyou.tobalsea.ytrace-1.0.1","path":"cyou.tobalsea.ytrace-1.0.1.yyp",},
   ],
   "IncludedFiles":[
     {"$GMIncludedFile":"","%Name":"crispy_license.txt","CopyToMask":-1,"filePath":"datafiles","name":"crispy_license.txt","resourceType":"GMIncludedFile","resourceVersion":"2.0",},
@@ -28,7 +28,7 @@
   "isEcma":false,
   "LibraryEmitters":[],
   "MetaData":{
-    "IDEVersion":"2026.100.0.1142",
+    "IDEVersion":"2026.100.0.1171",
   },
   "name":"crispy",
   "resources":[

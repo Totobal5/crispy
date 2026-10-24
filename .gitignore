@@ -75,9 +75,3 @@ __pycache__/
 # GMRT
 .Build
 Build/
-
-# Github
-.github/Documentation
-.github/git-log
-.github/skills
-.github/copilot-instructions.md

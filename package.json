@@ -3,7 +3,7 @@
   "version": "1.0.1",
   "description": "Crispy is a GameMaker testing framework for organizing and running automated tests.\r\n\r\nUse CrispyRunner to run test suites, CrispySuite to group related cases, and CrispyCase to write assertions for values, collections, errors, and deep structures. Tests can be registered manually or discovered from global functions with a shared prefix.\r\n\r\nCrispyCaseAsync supports tests that wait for Begin Step, Step, or End Step events, with configurable frame- or time-based timeouts.\r\n\r\nResults are collected by the runner and written to the Output window.",
   "files": [
-    "com.toto.crispy-1.0.1.yymps"
+    "cyou.tobalsea.crispy-1.0.1.yymps"
   ],
   "keywords": [
     "test-suite",
